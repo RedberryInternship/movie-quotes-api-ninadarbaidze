@@ -1,0 +1,57 @@
+openapi: 3.0.0
+info:
+  title: Movie Quotes API
+  description: Movie quotes
+  version: 0.1.9
+
+servers:
+  - url: http://localhost:3001/
+    description: local server
+  - url: https://folksoul-api.nina.redberryinternship.ge/
+    description: production server
+
+    
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+paths:
+  /signup:
+    post:
+      tags:
+        - Registration
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+              required:
+                - username
+                - email
+                - password
+                - repeatPassword
+              example:
+                username: nyx123
+                email: nyx@gmail.com
+                password: nyx12345678
+                repeatPassword: nyx12345678
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im5pbmEiLCJpYXQiOjE2NTg4MjI1MDYsImV4cCI6MTY1ODgyOTcwNn0.YrCi-u5goplJekTCual5ilVrHsU17_TWu68AYG68beY
+
