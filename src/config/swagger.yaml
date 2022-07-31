@@ -37,12 +37,10 @@ paths:
                 - username
                 - email
                 - password
-                - repeatPassword
               example:
                 username: nyx123
                 email: nyx@gmail.com
                 password: nyx12345678
-                repeatPassword: nyx12345678
       responses:
         '201':
           description: Created

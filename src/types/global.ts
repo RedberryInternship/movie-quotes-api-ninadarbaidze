@@ -8,3 +8,4 @@ export interface UserTypes {
     password: string,
     repeatPassword: string
   }
+
