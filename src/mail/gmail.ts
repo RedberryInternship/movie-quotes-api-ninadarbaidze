@@ -1,4 +1,6 @@
 import nodemailer from 'nodemailer'
+import path from 'path'
+import hbs from 'nodemailer-express-handlebars'
 
 export const sendConfirmationEmail = async (username: string, email: string, token: string ) => {
 
@@ -15,12 +17,29 @@ let transporter = nodemailer.createTransport({
       rejectUnauthorized: false
     }
   })
+
+  const handlebarOptions: any = {
+    viewEngine: {
+      extName: ".handlebars",
+      partialsDir: path.join(`${process.cwd()}/src/views`),
+      defaultLayout: false,
+    },
+    viewPath: path.join(`${process.cwd()}/src/views`),
+    extName: ".handlebars",
+  }
+
+
+  transporter.use('compile', hbs(handlebarOptions));
   
   let mailOptions = {
     from: 'Movie Quotes',
     to: email,
     subject: `Confirm your account ${username}`,
-    text: 'test email from nina'
+    template: 'email',  
+    context: {
+      title: 'Title Here',
+      text: "Lorem ipsum dolor sit amet, consectetur..."
+    }
   }
   
   transporter.sendMail(mailOptions, (err, success) => {
