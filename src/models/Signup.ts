@@ -14,7 +14,7 @@ const signupSchema = new mongoose.Schema({
     required: true,
 
   },
-  confirmed: {
+  verified: {
     type: Boolean,
     default: false,
   },

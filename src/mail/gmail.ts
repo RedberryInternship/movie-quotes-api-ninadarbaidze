@@ -10,8 +10,8 @@ let transporter = nodemailer.createTransport({
     port: 465,
     secure: true,
     auth: {
-      user: 'moviequote.redberry@gmail.com',
-      pass: 'gdbaqxivxmlrgytq'
+      user: process.env.MAIL_GMAIL_USER,
+      pass: process.env.MAIL_GMAIL_PASSWORD
     },
     tls: {
       rejectUnauthorized: false
@@ -30,6 +30,8 @@ let transporter = nodemailer.createTransport({
 
 
   transporter.use('compile', hbs(handlebarOptions));
+
+  const verificationUrl = `${process.env.FRONT_URL}/verify-account/${token}`
   
   let mailOptions = {
     from: 'Movie Quotes',
@@ -37,8 +39,8 @@ let transporter = nodemailer.createTransport({
     subject: `Confirm your account ${username}`,
     template: 'email',  
     context: {
-      title: 'Title Here',
-      text: "Lorem ipsum dolor sit amet, consectetur..."
+      username: username,
+      url: verificationUrl
     }
   }
   

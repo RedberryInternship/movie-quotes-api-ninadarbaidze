@@ -1,1 +1,1 @@
-export { default as signupRoutes } from './signup'
+export { default as authRoutes } from './auth'

@@ -1,1 +1,2 @@
-export { default as signup } from './auth-controller'
+export * from './auth-controller'
+

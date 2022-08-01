@@ -2,13 +2,14 @@ import bcrypt from 'bcryptjs'
 import {  Request, Response, NextFunction } from 'express';
 import { validationResult } from 'express-validator'
 import { User } from 'models'
-import { UserTypes} from 'types'
-import jwt from 'jsonwebtoken'
+import { UserTypes } from 'types'
+import jwt, { JwtPayload } from 'jsonwebtoken'
 import { sendConfirmationEmail } from 'mail'
 
 
-const signup = async (req: Request, res: Response, next: NextFunction) => {
+export const signup = async (req: Request, res: Response, next: NextFunction) => {
   const { username, email, password } = req.body as UserTypes
+
   const errors = validationResult(req)
   if (!errors.isEmpty()) {
     res.status(422).json({ errorMessage: errors.array()[0].msg })
@@ -44,13 +45,12 @@ const signup = async (req: Request, res: Response, next: NextFunction) => {
       
     })
 
-    //register token
     const token = jwt.sign(
       {
-        username: response._id,
+        userId: response._id,
       },
-      'seriouslysupersecret',
-      { expiresIn: '2h' }
+      process.env.JWT_SEC!,
+      { expiresIn: '1h' }
     )
 
     await sendConfirmationEmail(response.username, response.email, token)
@@ -64,5 +64,38 @@ const signup = async (req: Request, res: Response, next: NextFunction) => {
   }
 }
 
+export const verifyAccount = async (req: Request, res: Response, next: NextFunction) => {
+  try {
 
-export default signup
+    const { token } = req.body
+    const { userId } = jwt.verify(token, process.env.JWT_SEC!) as JwtPayload
+  
+    const isTokenExpired = (tok: string) =>
+      Date.now() >=
+      JSON.parse(Buffer.from(tok.split('.')[1], 'base64').toString()).exp * 1000
+  
+    if (isTokenExpired(token)) {
+      res.status(401).json({ message: 'Your Token is Expired' })
+      return
+    }
+  
+    const user = await User.findOne({ _id: userId })
+  
+    if(!user) {
+      res.status(404).json({ message: 'Unfortunately user doesn/t exists' })
+      return
+    }
+  
+    await user.updateOne({ verified: true })
+    res.status(200).json({message: 'Your account is verified'})
+
+  } catch (err: any) {
+    if (!err.statusCode) {
+      err.statusCode = 500
+    }
+    next(err)
+  }
+
+}
+
+
