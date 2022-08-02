@@ -64,6 +64,41 @@ export const signup = async (req: Request, res: Response, next: NextFunction) =>
   }
 }
 
+
+export const authGoogle = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const {email, username} = req.body
+
+    const existing = await User.findOne({ email })
+
+    if(existing) {
+      const token = jwt.sign({ email, username }, process.env.JWT_SEC_AUTH!)
+      return res.status(200).json({
+        token,
+      })
+    } else {
+      const googleUser = await User.create({
+        email,
+        username,        
+      })
+
+      await googleUser.updateOne({ verified: true })
+  
+      res.status(201).json({
+        message: 'User Created and verified Successfully',
+        
+      })
+    }
+
+  } catch(err: any) {
+    if (!err.statusCode) {
+      err.statusCode = 500
+    }
+    next(err)
+  }
+
+}
+
 export const verifyAccount = async (req: Request, res: Response, next: NextFunction) => {
   try {
 
