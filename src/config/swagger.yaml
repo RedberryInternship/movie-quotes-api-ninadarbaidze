@@ -7,7 +7,7 @@ info:
 servers:
   - url: http://localhost:3001/
     description: local server
-  - url: https://folksoul-api.nina.redberryinternship.ge/
+  - url: https://moviequotes-api.nina.redberryinternship.ge/
     description: production server
 
     
@@ -18,11 +18,12 @@ components:
       scheme: bearer
       bearerFormat: JWT
 
+
 paths:
   /signup:
     post:
       tags:
-        - Registration
+        - Authentication
       requestBody:
         content:
           application/json:
@@ -49,7 +50,67 @@ paths:
               schema:
                 type: object
                 properties:
-                  message:
+                  token:
                     type: string
                     example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im5pbmEiLCJpYXQiOjE2NTg4MjI1MDYsImV4cCI6MTY1ODgyOTcwNn0.YrCi-u5goplJekTCual5ilVrHsU17_TWu68AYG68beY
+                    
+  /verify-account:
+    post:
+      tags:
+        - Authentication
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                token:
+                  type: string
+              required:
+                - token
+              example:
+                token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9
+      responses:
+        '200':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Your account is verified
+  
+  /auth-google:
+    post:
+      tags:
+        - Authentication
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                email:
+                   type: string
+              required:
+                - token
+              example:
+                username: ketokote
+                email: kote@keto.ge
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: User Created and verified Successfully
+
 

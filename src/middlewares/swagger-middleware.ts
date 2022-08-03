@@ -3,7 +3,7 @@ import YAML from 'yamljs'
 
 const swaggerMiddleware = () => {
   const specifications = {
-    customSiteTitle: 'FolkSoul API',
+    customSiteTitle: 'Movie Quotes API',
     customCss: '.swagger-ui .topbar { display: none }',
   }
   const swaggerDocument = YAML.load('./src/config/swagger.yaml') as any
