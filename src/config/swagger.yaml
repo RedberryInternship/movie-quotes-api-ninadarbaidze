@@ -50,9 +50,9 @@ paths:
               schema:
                 type: object
                 properties:
-                  token:
+                  message:
                     type: string
-                    example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im5pbmEiLCJpYXQiOjE2NTg4MjI1MDYsImV4cCI6MTY1ODgyOTcwNn0.YrCi-u5goplJekTCual5ilVrHsU17_TWu68AYG68beY
+                    example: User Created Successfully
                     
   /verify-account:
     post:
