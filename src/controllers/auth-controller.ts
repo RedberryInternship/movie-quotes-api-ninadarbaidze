@@ -3,7 +3,7 @@ import {  Request, Response, NextFunction } from 'express';
 import { validationResult } from 'express-validator'
 import { User } from 'models'
 import { UserTypes } from 'types'
-import jwt, { JwtPayload } from 'jsonwebtoken'
+import jwt, { JwtPayload, Secret } from 'jsonwebtoken'
 import { sendConfirmationEmail } from 'mail'
 
 
@@ -49,7 +49,7 @@ export const signup = async (req: Request, res: Response, next: NextFunction) =>
       {
         userId: response._id,
       },
-      process.env.JWT_SEC!,
+      process.env.JWT_SEC as Secret,
       { expiresIn: '1h' }
     )
 
