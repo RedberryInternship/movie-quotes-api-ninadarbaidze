@@ -3,8 +3,9 @@ import {  Request, Response, NextFunction } from 'express';
 import { validationResult } from 'express-validator'
 import { User } from 'models'
 import { UserTypes } from 'types'
-import jwt, { JwtPayload, Secret } from 'jsonwebtoken'
-import { sendConfirmationEmail } from 'mail'
+import jwt, { JwtPayload } from 'jsonwebtoken'
+import { sendConfirmationEmail, sendPasswordChangeEmail } from 'mail'
+
 
 
 export const signup = async (req: Request, res: Response, next: NextFunction) => {
@@ -133,4 +134,34 @@ export const verifyAccount = async (req: Request, res: Response, next: NextFunct
 
 }
 
+
+export const passwordRecovery = async (req: Request, res: Response, next: NextFunction) => {
+ const { email } = req.body
+ try {
+   const existing = await User.findOne({ email })
+  
+      if(!existing) {
+        res.status(404).json({ message: 'Unfortunately user doesn/t exists' })
+        return
+      }
+    const token = jwt.sign({ email }, process.env.JWT_SEC_PASS,  { expiresIn: '1h' })
+  
+    await sendPasswordChangeEmail(existing.username, existing.email, token)
+ 
+ } catch(err: any) {
+    if (!err.statusCode) {
+      err.statusCode = 500
+    }
+    next(err)
+  }  
+
+
+
+}
+
+
+export const updatePassword = async (req: Request, res: Response, next: NextFunction) => {
+ 
+
+}
 

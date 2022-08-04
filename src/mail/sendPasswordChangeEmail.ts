@@ -2,7 +2,7 @@ import nodemailer from 'nodemailer'
 import path from 'path'
 import hbs from 'nodemailer-express-handlebars'
 
-export const sendConfirmationEmail = async (username: string, email: string, token: string ) => {
+export const sendPasswordChangeEmail = async (username: string, email: string, token: string ) => {
 
 let transporter = nodemailer.createTransport({
     service: 'gmail',
@@ -36,8 +36,8 @@ let transporter = nodemailer.createTransport({
   let mailOptions = {
     from: 'Movie Quotes',
     to: email,
-    subject: `Confirm your account ${username}`,
-    template: 'email',  
+    subject: `Update your password${username}`,
+    template: 'changePassword',  
     context: {
       username: username,
       url: verificationUrl
