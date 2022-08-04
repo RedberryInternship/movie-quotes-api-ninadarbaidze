@@ -1,0 +1,116 @@
+openapi: 3.0.0
+info:
+  title: Movie Quotes API
+  description: Movie quotes
+  version: 0.1.9
+
+servers:
+  - url: http://localhost:3001/
+    description: local server
+  - url: https://moviequotes-api.nina.redberryinternship.ge/
+    description: production server
+
+    
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+
+paths:
+  /signup:
+    post:
+      tags:
+        - Authentication
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+              required:
+                - username
+                - email
+                - password
+              example:
+                username: nyx123
+                email: nyx@gmail.com
+                password: nyx12345678
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: User Created Successfully
+                    
+  /verify-account:
+    post:
+      tags:
+        - Authentication
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                token:
+                  type: string
+              required:
+                - token
+              example:
+                token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9
+      responses:
+        '200':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Your account is verified
+  
+  /auth-google:
+    post:
+      tags:
+        - Authentication
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                email:
+                   type: string
+              required:
+                - token
+              example:
+                username: ketokote
+                email: kote@keto.ge
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: User Created and verified Successfully
+
+
