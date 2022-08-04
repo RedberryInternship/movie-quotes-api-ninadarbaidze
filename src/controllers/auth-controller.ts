@@ -49,7 +49,7 @@ export const signup = async (req: Request, res: Response, next: NextFunction) =>
       {
         userId: response._id,
       },
-      process.env.JWT_SEC as Secret,
+      process.env.JWT_SEC,
       { expiresIn: '1h' }
     )
 
@@ -72,7 +72,7 @@ export const authGoogle = async (req: Request, res: Response, next: NextFunction
     const existing = await User.findOne({ email })
 
     if(existing) {
-      const token = jwt.sign({ email, username }, process.env.JWT_SEC_AUTH!)
+      const token = jwt.sign({ email, username }, process.env.JWT_SEC_AUTH)
       return res.status(200).json({
         token,
       })
@@ -103,7 +103,7 @@ export const verifyAccount = async (req: Request, res: Response, next: NextFunct
   try {
 
     const { token } = req.body
-    const { userId } = jwt.verify(token, process.env.JWT_SEC!) as JwtPayload
+    const { userId } = jwt.verify(token, process.env.JWT_SEC) as JwtPayload
   
     const isTokenExpired = (tok: string) =>
       Date.now() >=
