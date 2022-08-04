@@ -118,7 +118,7 @@ export const verifyAccount = async (req: Request, res: Response, next: NextFunct
     const user = await User.findOne({ _id: userId })
   
     if(!user) {
-      res.status(404).json({ message: 'Unfortunately user doesn/t exists' })
+      res.status(404).json({ message: 'Unfortunately user doesn\'t exists' })
       return
     }
   
@@ -141,9 +141,14 @@ export const passwordRecovery = async (req: Request, res: Response, next: NextFu
    const existing = await User.findOne({ email })
   
       if(!existing) {
-        res.status(404).json({ message: 'Unfortunately user doesn/t exists' })
+        res.status(404).json({ message: 'Unfortunately user doesn\'t exists' })
         return
       }
+    
+    res.status(200).json({
+        message: 'Password recovery link is sent',
+        
+      })
     const token = jwt.sign({ email }, process.env.JWT_SEC_PASS,  { expiresIn: '1h' })
   
     await sendPasswordChangeEmail(existing.username, existing.email, token)

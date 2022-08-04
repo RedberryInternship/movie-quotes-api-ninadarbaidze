@@ -112,5 +112,34 @@ paths:
                   message:
                     type: string
                     example: User Created and verified Successfully
+  /password-recovery:
+    post:
+      tags:
+        - Authentication
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                   type: string
+              required:
+                - email
+              example:
+                email: ninadarbaidze66@gmail.com
+      responses:
+        '200':
+          description: Link is sent
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Password recovery link is sent
+
+
 
 
