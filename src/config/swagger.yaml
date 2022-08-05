@@ -139,7 +139,38 @@ paths:
                   message:
                     type: string
                     example: Password recovery link is sent
-
+  
+  /update-password:
+    post:
+        tags:
+          - Authentication
+        requestBody:
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  password:
+                    type: string
+                  token:  
+                    type: string
+                    required:
+                    - password
+                    - token
+                    example:
+                      email: ninadarbaidze66@gmail.com
+                      token: dsdsndajsdjadhsjhdsjdhsjhdsbbbcbbcc343
+        responses:
+          '200':
+            description: Password updated
+            content: 
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    message:
+                      type: string
+                      example: Password is updated
 
 
 

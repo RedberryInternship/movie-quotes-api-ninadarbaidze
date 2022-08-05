@@ -179,13 +179,25 @@ export const updatePassword = async (req: Request, res: Response, next: NextFunc
 
     if(!password) {
       return res.status(404).json({
-        message: 'something went wrong, please check your registration method',
+        message: 'Something went wrong, please check your registration method',
       })
+    }
+
+    const isTokenExpired = (tok: string) =>
+    Date.now() >=
+    JSON.parse(Buffer.from(tok.split('.')[1], 'base64').toString()).exp * 1000
+
+    if (isTokenExpired(token)) {
+      res.status(401).json({ message: 'Your Token is Expired' })
     }
     
     const hashedPass = await bcrypt.hash(password, 12)
 
     await existingUser!.updateOne({ password: hashedPass })
+
+    res.status(200).json({
+      message: 'Password is updated'
+    })
 
   } catch(err: any) {
     if (!err.statusCode) {
