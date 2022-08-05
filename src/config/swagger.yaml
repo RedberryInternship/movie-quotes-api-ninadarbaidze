@@ -97,7 +97,8 @@ paths:
                 email:
                    type: string
               required:
-                - token
+                - username
+                - email
               example:
                 username: ketokote
                 email: kote@keto.ge
@@ -112,6 +113,8 @@ paths:
                   message:
                     type: string
                     example: User Created and verified Successfully
+  
+  
   /password-recovery:
     post:
       tags:
@@ -154,12 +157,13 @@ paths:
                     type: string
                   token:  
                     type: string
-                    required:
+                required:
                     - password
                     - token
-                    example:
-                      email: ninadarbaidze66@gmail.com
+                example:
+                      password: ninadarbaidze66@gmail.com
                       token: dsdsndajsdjadhsjhdsjdhsjhdsbbbcbbcc343
+                      
         responses:
           '200':
             description: Password updated
