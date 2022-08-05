@@ -16,16 +16,16 @@ export const signup = async (req: Request, res: Response, next: NextFunction) =>
     res.status(422).json({ errorMessage: errors.array()[0].msg })
   }
   try {
-    const userExists = await User.findOne({ username })
-    const emailExists = await User.findOne({ email })
+    const existingUser = await User.findOne({ username })
+    const existingEmail = await User.findOne({ email })
 
-    if (userExists) {
+    if (existingUser) {
       res.status(409).json({
         message: 'someone with this credentials already exists!',
       })
       return
     }  
-    if (emailExists) {
+    if (existingEmail) {
       res.status(409).json({
         message: 'someone with this credentials already exists!',
       })
@@ -138,9 +138,9 @@ export const verifyAccount = async (req: Request, res: Response, next: NextFunct
 export const passwordRecovery = async (req: Request, res: Response, next: NextFunction) => {
  const { email } = req.body
  try {
-   const existing = await User.findOne({ email })
+   const existingUser = await User.findOne({ email })
   
-      if(!existing) {
+      if(!existingUser) {
         res.status(404).json({ message: 'Unfortunately user doesn\'t exists' })
         return
       }
@@ -151,7 +151,7 @@ export const passwordRecovery = async (req: Request, res: Response, next: NextFu
       })
     const token = jwt.sign({ email }, process.env.JWT_SEC_PASS,  { expiresIn: '1h' })
   
-    await sendPasswordChangeEmail(existing.username, existing.email, token)
+    await sendPasswordChangeEmail(existingUser.username, existingUser.email, token)
  
  } catch(err: any) {
     if (!err.statusCode) {
@@ -166,7 +166,33 @@ export const passwordRecovery = async (req: Request, res: Response, next: NextFu
 
 
 export const updatePassword = async (req: Request, res: Response, next: NextFunction) => {
+ const {password, token} = req.body 
+ const errors = validationResult(req)
  
+ if (!errors.isEmpty()) {
+    return res.status(422).json({ errorMessage: errors.array()[0].msg })
+  }
+
+  try {
+    const { email } = jwt.verify(token, process.env.JWT_SEC_PASS) as JwtPayload
+    const existingUser = await User.findOne({ email })
+
+    if(!password) {
+      return res.status(404).json({
+        message: 'something went wrong, please check your registration method',
+      })
+    }
+    
+    const hashedPass = await bcrypt.hash(password, 12)
+
+    await existingUser!.updateOne({ password: hashedPass })
+
+  } catch(err: any) {
+    if (!err.statusCode) {
+      err.statusCode = 500
+    }
+    next(err)
+  }
 
 }
 

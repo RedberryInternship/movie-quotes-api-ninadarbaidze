@@ -31,7 +31,7 @@ let transporter = nodemailer.createTransport({
 
   transporter.use('compile', hbs(handlebarOptions));
 
-  const verificationUrl = `${process.env.FRONT_URL}/verify-account/${token}`
+  const verificationUrl = `${process.env.FRONT_URL}/password-recovery/${token}`
   
   let mailOptions = {
     from: 'Movie Quotes',
