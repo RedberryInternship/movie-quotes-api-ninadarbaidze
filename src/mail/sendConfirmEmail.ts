@@ -1,6 +1,6 @@
 import nodemailer from 'nodemailer'
 import path from 'path'
-import hbs from 'nodemailer-express-handlebars'
+import hbs, { NodemailerExpressHandlebarsOptions } from 'nodemailer-express-handlebars'
 
 export const sendConfirmationEmail = async (username: string, email: string, token: string ) => {
 
@@ -18,9 +18,9 @@ let transporter = nodemailer.createTransport({
     }
   })
 
-  const handlebarOptions: any = {
+  const handlebarOptions: NodemailerExpressHandlebarsOptions = {
     viewEngine: {
-      extName: ".handlebars",
+      extname: ".handlebars",
       partialsDir: path.join(`${process.cwd()}/src/views`),
       defaultLayout: false,
     },

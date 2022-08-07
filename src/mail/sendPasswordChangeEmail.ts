@@ -1,6 +1,6 @@
 import nodemailer from 'nodemailer'
 import path from 'path'
-import hbs from 'nodemailer-express-handlebars'
+import hbs, { NodemailerExpressHandlebarsOptions } from 'nodemailer-express-handlebars'
 
 export const sendPasswordChangeEmail = async (username: string, email: string, token: string ) => {
 
@@ -18,9 +18,9 @@ let transporter = nodemailer.createTransport({
     }
   })
 
-  const handlebarOptions: any = {
+  const handlebarOptions: NodemailerExpressHandlebarsOptions = {
     viewEngine: {
-      extName: ".handlebars",
+      extname: ".handlebars",
       partialsDir: path.join(`${process.cwd()}/src/views`),
       defaultLayout: false,
     },
@@ -36,7 +36,7 @@ let transporter = nodemailer.createTransport({
   let mailOptions = {
     from: 'Movie Quotes',
     to: email,
-    subject: `Update your password${username}`,
+    subject: `Update your password ${username}`,
     template: 'changePassword',  
     context: {
       username: username,
