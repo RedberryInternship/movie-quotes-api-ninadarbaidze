@@ -3,8 +3,9 @@ import {  Request, Response, NextFunction } from 'express';
 import { validationResult } from 'express-validator'
 import { User } from 'models'
 import { UserTypes } from 'types'
-import jwt, { JwtPayload, Secret } from 'jsonwebtoken'
-import { sendConfirmationEmail } from 'mail'
+import jwt, { JwtPayload } from 'jsonwebtoken'
+import { sendConfirmationEmail, sendPasswordChangeEmail } from 'mail'
+
 
 
 export const signup = async (req: Request, res: Response, next: NextFunction) => {
@@ -15,16 +16,16 @@ export const signup = async (req: Request, res: Response, next: NextFunction) =>
     res.status(422).json({ errorMessage: errors.array()[0].msg })
   }
   try {
-    const userExists = await User.findOne({ username })
-    const emailExists = await User.findOne({ email })
+    const existingUser = await User.findOne({ username })
+    const existingEmail = await User.findOne({ email })
 
-    if (userExists) {
+    if (existingUser) {
       res.status(409).json({
         message: 'someone with this credentials already exists!',
       })
       return
     }  
-    if (emailExists) {
+    if (existingEmail) {
       res.status(409).json({
         message: 'someone with this credentials already exists!',
       })
@@ -117,7 +118,7 @@ export const verifyAccount = async (req: Request, res: Response, next: NextFunct
     const user = await User.findOne({ _id: userId })
   
     if(!user) {
-      res.status(404).json({ message: 'Unfortunately user doesn/t exists' })
+      res.status(404).json({ message: 'Unfortunately user doesn\'t exists' })
       return
     }
   
@@ -133,4 +134,77 @@ export const verifyAccount = async (req: Request, res: Response, next: NextFunct
 
 }
 
+
+export const passwordRecovery = async (req: Request, res: Response, next: NextFunction) => {
+ const { email } = req.body
+ try {
+   const existingUser = await User.findOne({ email })
+  
+      if(!existingUser) {
+        res.status(404).json({ message: 'Unfortunately user doesn\'t exists' })
+        return
+      }
+    
+    res.status(200).json({
+        message: 'Password recovery link is sent',
+        
+      })
+    const token = jwt.sign({ email }, process.env.JWT_SEC_PASS,  { expiresIn: '1h' })
+  
+    await sendPasswordChangeEmail(existingUser.username, existingUser.email, token)
+ 
+ } catch(err: any) {
+    if (!err.statusCode) {
+      err.statusCode = 500
+    }
+    next(err)
+  }  
+
+
+
+}
+
+
+export const updatePassword = async (req: Request, res: Response, next: NextFunction) => {
+ const {password, token} = req.body 
+ const errors = validationResult(req)
+ 
+ if (!errors.isEmpty()) {
+    return res.status(422).json({ errorMessage: errors.array()[0].msg })
+  }
+
+  try {
+    const { email } = jwt.verify(token, process.env.JWT_SEC_PASS) as JwtPayload
+    const existingUser = await User.findOne({ email })
+
+    if(!password) {
+      return res.status(404).json({
+        message: 'Something went wrong, please check your registration method',
+      })
+    }
+
+    const isTokenExpired = (tok: string) =>
+    Date.now() >=
+    JSON.parse(Buffer.from(tok.split('.')[1], 'base64').toString()).exp * 1000
+
+    if (isTokenExpired(token)) {
+      res.status(401).json({ message: 'Your Token is Expired' })
+    }
+    
+    const hashedPass = await bcrypt.hash(password, 12)
+
+    await existingUser!.updateOne({ password: hashedPass })
+
+    res.status(200).json({
+      message: 'Password is updated'
+    })
+
+  } catch(err: any) {
+    if (!err.statusCode) {
+      err.statusCode = 500
+    }
+    next(err)
+  }
+
+}
 

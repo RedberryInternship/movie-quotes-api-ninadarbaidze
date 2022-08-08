@@ -1,1 +1,2 @@
-export * from './gmail'
+export * from './sendConfirmEmail'
+export * from './sendPasswordChangeEmail'

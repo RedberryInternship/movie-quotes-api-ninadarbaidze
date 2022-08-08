@@ -1,8 +1,8 @@
 import nodemailer from 'nodemailer'
 import path from 'path'
-import hbs from 'nodemailer-express-handlebars'
+import hbs, { NodemailerExpressHandlebarsOptions } from 'nodemailer-express-handlebars'
 
-export const sendConfirmationEmail = async (username: string, email: string, token: string ) => {
+export const sendPasswordChangeEmail = async (username: string, email: string, token: string ) => {
 
 let transporter = nodemailer.createTransport({
     service: 'gmail',
@@ -18,9 +18,9 @@ let transporter = nodemailer.createTransport({
     }
   })
 
-  const handlebarOptions: any = {
+  const handlebarOptions: NodemailerExpressHandlebarsOptions = {
     viewEngine: {
-      extName: ".handlebars",
+      extname: ".handlebars",
       partialsDir: path.join(`${process.cwd()}/src/views`),
       defaultLayout: false,
     },
@@ -31,13 +31,13 @@ let transporter = nodemailer.createTransport({
 
   transporter.use('compile', hbs(handlebarOptions));
 
-  const verificationUrl = `${process.env.FRONT_URL}/verify-account/${token}`
+  const verificationUrl = `${process.env.FRONT_URL}/password-recovery/${token}`
   
   let mailOptions = {
     from: 'Movie Quotes',
     to: email,
-    subject: `Confirm your account ${username}`,
-    template: 'email',  
+    subject: `Update your password ${username}`,
+    template: 'changePassword',  
     context: {
       username: username,
       url: verificationUrl
