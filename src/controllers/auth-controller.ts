@@ -65,6 +65,44 @@ export const signup = async (req: Request, res: Response, next: NextFunction) =>
   }
 }
 
+export const login = async (req: Request, res: Response, next: NextFunction) => { 
+  const {user, password, remember} = req.body
+
+  try {
+
+    const existingUser = await User.findOne({email: user} || await User.findOne({username: user}))
+
+    if(!existingUser) {
+      return res.status(404).json({message: 'Please provide correct credentials'})
+    }
+
+    const isPasswordEqual = await bcrypt.compare(password, existingUser.password!)
+    
+    if(!isPasswordEqual) {
+      return res.status(401).json({message: 'Please provide correct credentials'})
+    }
+
+    if(existingUser.verified === false) {
+      return res.status(401).json({message: 'You\'re email is not verified, please verify your account first'})
+    }
+
+
+    const token = jwt.sign(
+      { userId: existingUser._id }, 
+      process.env.JWT_SEC_AUTH!, 
+      { expiresIn: remember ? '365d' : '6h' })
+
+    res.status(200).json({token})
+
+  } catch(err: any) {
+    if (!err.statusCode) {
+      err.statusCode = 500
+    }
+    next(err)
+  }
+
+}
+
 
 export const authGoogle = async (req: Request, res: Response, next: NextFunction) => {
   try {

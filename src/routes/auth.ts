@@ -1,6 +1,6 @@
 import express from 'express'
-import { signup, verifyAccount, authGoogle, passwordRecovery, updatePassword } from 'controllers'
-import { validateSignupForm } from 'schemas'
+import { signup, verifyAccount, authGoogle, passwordRecovery, updatePassword, login } from 'controllers'
+import { validateSignupForm, validateLoginForm } from 'schemas'
 
 const router = express.Router()
 
