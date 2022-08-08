@@ -4,6 +4,7 @@ import dotenv from 'dotenv'
 import { swaggerMiddleware, errorHandler } from 'middlewares'
 import { connectMongoose } from 'config'
 import { authRoutes } from 'routes'
+import { profileRoutes } from 'routes'
 import cors from 'cors'
 
 const server = express();
@@ -19,6 +20,7 @@ server.use('/api-docs', swaggerMiddleware() as any)
 server.use(cors())
 
 server.use(authRoutes)
+server.use(profileRoutes)
 
 server.use(errorHandler)
 
