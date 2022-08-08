@@ -82,9 +82,9 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
       return res.status(401).json({message: 'Please provide correct credentials'})
     }
 
-    // if(existingUser.verified === false) {
-    //   return res.status(401).json({message: 'You\'re email is not verified, please verify your account first'})
-    // }
+    if(existingUser.verified === false) {
+      return res.status(401).json({message: 'You\'re email is not verified, please verify your account first'})
+    }
 
 
     const token = jwt.sign(
@@ -92,7 +92,7 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
       process.env.JWT_SEC_AUTH!, 
       { expiresIn: remember ? '365d' : '6h' })
 
-    res.status(200).json({token})
+    res.status(200).json({token, userId: existingUser._id})
 
   } catch(err: any) {
     if (!err.statusCode) {
@@ -112,6 +112,8 @@ export const authGoogle = async (req: Request, res: Response, next: NextFunction
 
     if(existing) {
       const token = jwt.sign({ email, username }, process.env.JWT_SEC_AUTH)
+      console.log(token)
+
       return res.status(200).json({
         token,
       })
@@ -120,6 +122,8 @@ export const authGoogle = async (req: Request, res: Response, next: NextFunction
         email,
         username,        
       })
+
+      
 
       await googleUser.updateOne({ verified: true })
   
