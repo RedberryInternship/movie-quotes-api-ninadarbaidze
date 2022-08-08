@@ -53,6 +53,45 @@ paths:
                   message:
                     type: string
                     example: User Created Successfully
+
+  /login:
+    post:
+      tags:
+        - Authentication
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user: 
+                  type: string
+                password: 
+                  type: string
+                remember: 
+                  type: boolean
+              required:
+                  - user
+                  - password
+              example:
+                user: nyx123
+                password: nyx12345678
+                remember: true
+      responses:
+        '200':
+          description: Logged in
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                 token:
+                    type: string
+                    example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2MmViYWM2ZGM5NjQzMGU4YzgzMTgz
+
+
+
+                
                     
   /verify-account:
     post:
