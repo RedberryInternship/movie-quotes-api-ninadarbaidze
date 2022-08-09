@@ -19,13 +19,24 @@ export const getProfileInfo =  async (req: Request, res: Response, next: NextFun
 
 export const updateProfile =  async (req: Request, res: Response, next: NextFunction) => {
   const {username, email, password, userId} = req.body
-  const profileImagePath = req.file!
+  const profileImage = req.file!
 
   try {
+    let reqBody
+
+      if(!profileImage && !password) {
+        reqBody = { username, email }
+      } else if (!profileImage) {
+        reqBody = { username, email, password }
+      } else if(!password) {
+        reqBody = { username, email, profileImage: profileImage.path }
+      }
+    
+
 
     const user = await User.findByIdAndUpdate(
       userId,
-      {profileImage: profileImagePath.path, username, email, password},
+      reqBody,
       {
         new: true,
       }
