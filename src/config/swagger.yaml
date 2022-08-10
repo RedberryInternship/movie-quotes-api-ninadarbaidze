@@ -215,5 +215,51 @@ paths:
                       type: string
                       example: Password is updated
 
+  /update-profile:
+    post: 
+      tags:
+        - Profile
+      security:
+        - bearerAuth: []
+      requestBody:
+            content:
+                 multipart/form-data:
+                  schema:
+                    type: object
+                    properties:
+                      username:
+                        type: string
+                      email:
+                        type: string
+                      password:
+                        type: string
+                      userId:
+                        type: string
+                      image:
+                        type: string
+                        format: binary
+                        required:
+                          - userId
+                        example:
+                          usename: nyx123
+                          email: nyx@gmail.com
+                          password: nyx@gmail.com
+                          userId: ikjge89087nnvr6
+                          image: filename
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Profile updated successfully
+
+
+
+
 
 

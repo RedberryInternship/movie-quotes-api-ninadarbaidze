@@ -82,9 +82,9 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
       return res.status(401).json({message: 'Please provide correct credentials'})
     }
 
-    // if(existingUser.verified === false) {
-    //   return res.status(401).json({message: 'You\'re email is not verified, please verify your account first'})
-    // }
+    if(existingUser.verified === false) {
+      return res.status(401).json({message: 'You\'re email is not verified, please verify your account first'})
+    }
 
 
     const token = jwt.sign(

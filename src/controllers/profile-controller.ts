@@ -39,7 +39,6 @@ export const updateProfile =  async (req: Request, res: Response, next: NextFunc
       }
     
      
-
     const user = await User.findByIdAndUpdate(
       userId,
       reqBody,
@@ -50,7 +49,7 @@ export const updateProfile =  async (req: Request, res: Response, next: NextFunc
 
     await user!.save()
     res.status(200).json({
-      message: 'Profile updated successfully', user
+      message: 'Profile updated successfully'
     })
   } catch(err: any) {
     if (!err.statusCode) {
