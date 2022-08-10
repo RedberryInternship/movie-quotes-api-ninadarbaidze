@@ -112,18 +112,16 @@ export const authGoogle = async (req: Request, res: Response, next: NextFunction
 
     if(existing) {
       const token = jwt.sign({ email, username }, process.env.JWT_SEC_AUTH)
-      console.log(token)
 
       return res.status(200).json({
         token,
+        userId: existing._id
       })
-    } else {
+    } else { 
       const googleUser = await User.create({
         email,
         username,        
       })
-
-      
 
       await googleUser.updateOne({ verified: true })
   

@@ -1,5 +1,7 @@
 import {  Request, Response, NextFunction } from 'express';
 import { User } from 'models'
+import bcrypt from 'bcryptjs'
+
 
 
 export const getProfileInfo =  async (req: Request, res: Response, next: NextFunction) => {
@@ -23,16 +25,20 @@ export const updateProfile =  async (req: Request, res: Response, next: NextFunc
 
   try {
     let reqBody
+    let hashedPass
+    if(password) {
+       hashedPass = await bcrypt.hash(password, 12)
+    }
 
       if(!profileImage && !password) {
         reqBody = { username, email }
       } else if (!profileImage) {
-        reqBody = { username, email, password }
+        reqBody = { username, email, password: hashedPass }
       } else if(!password) {
         reqBody = { username, email, profileImage: profileImage.path }
       }
     
-
+     
 
     const user = await User.findByIdAndUpdate(
       userId,
