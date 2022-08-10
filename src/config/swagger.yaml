@@ -259,6 +259,45 @@ paths:
                     example: Profile updated successfully
 
 
+  /profile/{id}:
+   get:
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            minimum: 1
+          description: user id
+      tags:
+        - Profile
+      security:
+        - bearerAuth: []
+      responses:
+        '200': 
+          description: Return user info
+          content:
+            application/json:
+              schema: 
+                type: object
+                properties:
+                  user:
+                    type: object
+                    properties:
+                      username: 
+                        type: string
+                      email: 
+                        type: string
+                      profileImage: 
+                        type: string
+              example:
+                socialLink:
+                    _id: 62b9cf91d2ee7fff6bf3b7cb
+                    username: nyx
+                    email: nyx@gmail.com
+                    image: images/profile-image.png
+
+
 
 
 

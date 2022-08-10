@@ -70,29 +70,38 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
 
   try {
 
-    const existingUser = await User.findOne({email: user} || await User.findOne({username: user}))
+    const existingEmail = await User.findOne({email: user})
+    const existingUsername = await User.findOne({username: user})
 
-    if(!existingUser) {
+    if(!existingUsername && !existingEmail) {
       return res.status(404).json({message: 'Please provide correct credentials'})
     }
 
-    const isPasswordEqual = await bcrypt.compare(password, existingUser.password!)
+    let existingUser
+
+    if(!existingEmail) {
+      existingUser = existingUsername
+    } else {
+      existingUser = existingEmail
+    }
+
+    const isPasswordEqual = await bcrypt.compare(password, existingUser!.password!)
     
     if(!isPasswordEqual) {
       return res.status(401).json({message: 'Please provide correct credentials'})
     }
 
-    if(existingUser.verified === false) {
+    if(existingUser!.verified === false) {
       return res.status(401).json({message: 'You\'re email is not verified, please verify your account first'})
     }
 
 
     const token = jwt.sign(
-      { userId: existingUser._id }, 
+      { userId: existingUser!._id }, 
       process.env.JWT_SEC_AUTH!, 
       { expiresIn: remember ? '365d' : '6h' })
 
-    res.status(200).json({token, userId: existingUser._id})
+    res.status(200).json({token, userId: existingUser!._id})
 
   } catch(err: any) {
     if (!err.statusCode) {
