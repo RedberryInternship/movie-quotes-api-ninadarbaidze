@@ -70,19 +70,10 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
 
   try {
 
-    const existingEmail = await User.findOne({email: user})
-    const existingUsername = await User.findOne({username: user})
+    const existingUser = await User.findOne(!user.includes('@')? {username: user} : {email: user})
 
-    if(!existingUsername && !existingEmail) {
+    if(!existingUser) {
       return res.status(404).json({message: 'Please provide correct credentials'})
-    }
-
-    let existingUser
-
-    if(!existingEmail) {
-      existingUser = existingUsername
-    } else {
-      existingUser = existingEmail
     }
 
     const isPasswordEqual = await bcrypt.compare(password, existingUser!.password!)
