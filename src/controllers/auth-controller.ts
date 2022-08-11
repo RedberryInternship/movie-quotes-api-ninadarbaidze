@@ -70,29 +70,29 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
 
   try {
 
-    const existingUser = await User.findOne({email: user} || await User.findOne({username: user}))
+    const existingUser = await User.findOne(!user.includes('@')? {username: user} : {email: user})
 
     if(!existingUser) {
       return res.status(404).json({message: 'Please provide correct credentials'})
     }
 
-    const isPasswordEqual = await bcrypt.compare(password, existingUser.password!)
+    const isPasswordEqual = await bcrypt.compare(password, existingUser!.password!)
     
     if(!isPasswordEqual) {
       return res.status(401).json({message: 'Please provide correct credentials'})
     }
 
-    if(existingUser.verified === false) {
+    if(existingUser!.verified === false) {
       return res.status(401).json({message: 'You\'re email is not verified, please verify your account first'})
     }
 
 
     const token = jwt.sign(
-      { userId: existingUser._id }, 
+      { userId: existingUser!._id }, 
       process.env.JWT_SEC_AUTH!, 
       { expiresIn: remember ? '365d' : '6h' })
 
-    res.status(200).json({token, userId: existingUser._id})
+    res.status(200).json({token, userId: existingUser!._id})
 
   } catch(err: any) {
     if (!err.statusCode) {
@@ -112,18 +112,16 @@ export const authGoogle = async (req: Request, res: Response, next: NextFunction
 
     if(existing) {
       const token = jwt.sign({ email, username }, process.env.JWT_SEC_AUTH)
-      console.log(token)
 
       return res.status(200).json({
         token,
+        userId: existing._id
       })
-    } else {
+    } else { 
       const googleUser = await User.create({
         email,
         username,        
       })
-
-      
 
       await googleUser.updateOne({ verified: true })
   

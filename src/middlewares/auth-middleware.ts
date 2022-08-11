@@ -20,7 +20,7 @@ const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
   }
   let decodedToken
   try {
-    decodedToken = jwt.verify(token, 'seriouslysupersecret')
+    decodedToken = jwt.verify(token,  process.env.JWT_SEC_AUTH)
   } catch (err: any) {
     err.statusCode = 500
     throw err

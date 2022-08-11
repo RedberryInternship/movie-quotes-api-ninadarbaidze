@@ -13,6 +13,9 @@ const signupSchema = new mongoose.Schema({
     type: String,
 
   },
+  profileImage: {
+    type: String,
+  },
   verified: {
     type: Boolean,
     default: false,
