@@ -19,7 +19,7 @@ const storageConfig = multer.diskStorage({
 const router = express.Router()
 
 router.post('/add-movie', isAuth,  upload.single('image'), addMovie)
-router.patch('/edit-movie', isAuth, upload.single('image'), editMovie)
-router.delete('/delete-movie', deleteMovie)
+router.patch('/edit-movie/:movieId',  upload.single('image'), editMovie)
+router.delete('/delete-movie', isAuth, deleteMovie)
 
 export default router

@@ -1,5 +1,4 @@
 import { Request, Response, NextFunction } from 'express'
-import { validationResult } from 'express-validator'
 import { Movie } from 'models'
 
 export const addMovie = async (
@@ -53,7 +52,37 @@ export const editMovie = async (
   req: Request,
   res: Response,
   next: NextFunction
-) => {}
+) => {
+    const { movieId } = req.params
+
+    if (!movieId.match(/^[0-9a-fA-F]{24}$/))
+    res.status(422).json({ message: 'Please provide a valid id' })
+
+    try {
+        const movie = await Movie.findById(movieId)
+    
+        if (!movie) {
+          res.status(404).json({ message: 'Could not find movie' })
+       
+        }
+        const updatedMovie = await Movie.findByIdAndUpdate(
+            movieId,
+          req.body,
+          {
+            new: true,
+          }
+        )
+        res.status(200).json({ message: 'Movie updated!', updatedMovie })
+      } catch (err: any) {
+        if (!err.statusCode) {
+          err.statusCode = 500
+        }
+        next(err)
+      }
+
+}
+
+
 export const deleteMovie = async (
   req: Request,
   res: Response,
