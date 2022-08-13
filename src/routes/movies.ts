@@ -1,5 +1,5 @@
 import express from 'express'
-import { addMovie, editMovie, deleteMovie } from 'controllers'
+import { addMovie, editMovie, deleteMovie, getMovies } from 'controllers'
 import { isAuth } from 'middlewares'
 import multer from 'multer';
 
@@ -18,8 +18,9 @@ const storageConfig = multer.diskStorage({
 
 const router = express.Router()
 
+router.get('/movies', isAuth, getMovies)
 router.post('/add-movie', isAuth,  upload.single('image'), addMovie)
-router.patch('/edit-movie/:movieId',  upload.single('image'), editMovie)
+router.patch('/edit-movie/:movieId', isAuth,  upload.single('image'), editMovie)
 router.delete('/delete-movie', isAuth, deleteMovie)
 
 export default router

@@ -6,6 +6,23 @@ export interface UserTypes {
     username: string,
     email: string,
     password: string,
-    repeatPassword: string
+    profileImage: string,
+    verified: boolean,
+    movies: MovieTypes[],
+  }
+
+  export interface MovieTypes {
+    en: MovieObj
+    ge: MovieObj
+    budget: number
+    genres: any[]
+    userId: string
+    image: string
+  }
+
+  export interface MovieObj {
+    movieName: string
+    director: string
+    description: string
   }
 

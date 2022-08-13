@@ -1,5 +1,32 @@
 import { Request, Response, NextFunction } from 'express'
-import { Movie } from 'models'
+import { Movie, User } from 'models'
+import {UserTypes} from 'types'
+
+
+
+
+
+export const getMovies = async (
+    _req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+        const movies = await Movie.find()
+          .populate({
+            path: 'userId',
+            select: ['-__v'],
+          })
+          .select('-__v')
+        res.status(200).json(movies)
+      } catch (err: any) {
+        if (!err.statusCode) {
+          err.statusCode = 500
+        }
+        next(err)
+      }
+
+  }
 
 export const addMovie = async (
   req: Request,
@@ -20,7 +47,7 @@ export const addMovie = async (
   const image = req.file!
 
   try {
-    const user = await Movie.create({
+    const movie = await Movie.create({
       en: {
         movieName: movieNameEN,
         director: directorEN,
@@ -37,7 +64,11 @@ export const addMovie = async (
       image: image.path,
     })
 
-    res.status(200).json({
+    const user = await User.findById(userId) as UserTypes | any
+    user.movies.push(movie)
+    await user.save()
+
+    res.status(201).json({
       message: 'Movie added successfully',
       user,
     })
