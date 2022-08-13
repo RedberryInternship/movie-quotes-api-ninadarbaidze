@@ -20,33 +20,27 @@ export const addMovie = async (
   } = req.body
   const image = req.file!
 
-  const errors = validationResult(req)
-  if (!errors.isEmpty()) {
-    res.status(422).json({ errorMessage: errors.array()[0].msg })
-  }
-
   try {
     const user = await Movie.create({
       en: {
         movieName: movieNameEN,
         director: directorEN,
-        description:  descriptionEN,
+        description: descriptionEN,
       },
       ge: {
         movieName: movieNameGE,
         director: directorGE,
-        description:  descriptionGE,
+        description: descriptionGE,
       },
       budget,
       genres: genre,
       userId,
-    //   image: image.path
+      image: image.path,
     })
 
-    
     res.status(200).json({
       message: 'Movie added successfully',
-      user
+      user,
     })
   } catch (err: any) {
     if (!err.statusCode) {
@@ -64,4 +58,22 @@ export const deleteMovie = async (
   req: Request,
   res: Response,
   next: NextFunction
-) => {}
+) => {
+  const { movieId } = req.body
+  if (!movieId.match(/^[0-9a-fA-F]{24}$/))
+    res.status(422).json({ message: 'Please provide a valid id' })
+
+  try {
+    const movie = await Movie.findById(movieId)
+    if (!movie) {
+      res.status(404).json({ message: 'Could not find movie' })
+    }
+    movie!.remove()
+    res.status(200).json({ message: 'movie was deleted successfully' })
+  } catch (err: any) {
+    if (!err.statusCode) {
+      err.statusCode = 500
+    }
+    next(err)
+  }
+}
