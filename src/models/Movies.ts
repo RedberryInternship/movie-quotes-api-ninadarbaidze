@@ -15,6 +15,7 @@ const movieSchema = new mongoose.Schema(
     },
     image: Schema.Types.String,
     budget: Schema.Types.Number,
+    year: Schema.Types.Number,
     userId: {
       type: Schema.Types.ObjectId,
       ref: 'User',

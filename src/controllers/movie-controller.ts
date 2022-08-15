@@ -1,32 +1,56 @@
 import { Request, Response, NextFunction } from 'express'
 import { Movie, User } from 'models'
-import {UserTypes} from 'types'
-
-
-
-
+import { UserTypes } from 'types'
 
 export const getMovies = async (
-    _req: Request,
-    res: Response,
-    next: NextFunction
-  ) => {
-    try {
-        const movies = await Movie.find()
-          .populate({
-            path: 'userId',
-            select: ['-__v'],
-          })
-          .select('-__v')
-        res.status(200).json(movies)
-      } catch (err: any) {
-        if (!err.statusCode) {
-          err.statusCode = 500
-        }
-        next(err)
-      }
-
+  _req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const movies = await Movie.find()
+      .populate({
+        path: 'userId',
+        select: ['-__v'],
+      })
+      .select('-__v')
+    res.status(200).json(movies)
+  } catch (err: any) {
+    if (!err.statusCode) {
+      err.statusCode = 500
+    }
+    next(err)
   }
+
+}
+export const getMoviesById = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const {movieId} = req.params
+
+  if (!movieId.match(/^[0-9a-fA-F]{24}$/))
+    res.status(422).json({ message: 'Please provide a valid id' })
+
+  try {
+    const movie = await Movie.findById(movieId)
+      .select('-__v')
+
+    if (!movie)
+      res.status(404).json({ message: 'Could not find movie' })
+
+    res.status(200).json({
+      movie,
+    })
+  } catch (err: any) {
+    if (!err.statusCode) {
+      err.statusCode = 500
+    }
+    next(err)
+  }
+  
+}
 
 export const addMovie = async (
   req: Request,
@@ -43,6 +67,7 @@ export const addMovie = async (
     descriptionGE,
     budget,
     userId,
+    year
   } = req.body
   const image = req.file!
 
@@ -59,18 +84,19 @@ export const addMovie = async (
         description: descriptionGE,
       },
       budget,
+      year,
       genres: genre,
       userId,
       image: image.path,
     })
 
-    const user = await User.findById(userId) as UserTypes | any
+    const user = (await User.findById(userId)) as UserTypes | any
     user.movies.push(movie)
     await user.save()
 
     res.status(201).json({
       message: 'Movie added successfully',
-      user,
+      movie,
     })
   } catch (err: any) {
     if (!err.statusCode) {
@@ -84,35 +110,28 @@ export const editMovie = async (
   res: Response,
   next: NextFunction
 ) => {
-    const { movieId } = req.params
+  const { movieId } = req.params
 
-    if (!movieId.match(/^[0-9a-fA-F]{24}$/))
+  if (!movieId.match(/^[0-9a-fA-F]{24}$/))
     res.status(422).json({ message: 'Please provide a valid id' })
 
-    try {
-        const movie = await Movie.findById(movieId)
-    
-        if (!movie) {
-          res.status(404).json({ message: 'Could not find movie' })
-       
-        }
-        const updatedMovie = await Movie.findByIdAndUpdate(
-            movieId,
-          req.body,
-          {
-            new: true,
-          }
-        )
-        res.status(200).json({ message: 'Movie updated!', updatedMovie })
-      } catch (err: any) {
-        if (!err.statusCode) {
-          err.statusCode = 500
-        }
-        next(err)
-      }
+  try {
+    const movie = await Movie.findById(movieId)
 
+    if (!movie) {
+      res.status(404).json({ message: 'Could not find movie' })
+    }
+    const updatedMovie = await Movie.findByIdAndUpdate(movieId, req.body, {
+      new: true,
+    })
+    res.status(200).json({ message: 'Movie updated!', updatedMovie })
+  } catch (err: any) {
+    if (!err.statusCode) {
+      err.statusCode = 500
+    }
+    next(err)
+  }
 }
-
 
 export const deleteMovie = async (
   req: Request,

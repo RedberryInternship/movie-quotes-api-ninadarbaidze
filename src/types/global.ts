@@ -18,6 +18,7 @@ export interface UserTypes {
     genres: any[]
     userId: string
     image: string
+    date: string
   }
 
   export interface MovieObj {
