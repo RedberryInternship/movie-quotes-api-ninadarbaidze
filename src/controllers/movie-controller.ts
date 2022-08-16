@@ -71,6 +71,9 @@ export const addMovie = async (
   } = req.body
   const image = req.file!
 
+
+  console.log(req.body)
+
   try {
     const movie = await Movie.create({
       en: {
@@ -105,6 +108,8 @@ export const addMovie = async (
     next(err)
   }
 }
+
+
 export const editMovie = async (
   req: Request,
   res: Response,
@@ -113,7 +118,26 @@ export const editMovie = async (
   const { movieId } = req.params
 
   if (!movieId.match(/^[0-9a-fA-F]{24}$/))
-    res.status(422).json({ message: 'Please provide a valid id' })
+  res.status(422).json({ message: 'Please provide a valid id' })
+
+  const {
+    genre,
+    movieNameEN,
+    movieNameGE,
+    directorEN,
+    directorGE,
+    descriptionEN,
+    descriptionGE,
+    budget,
+    userId,
+    year, 
+    image,
+  } = req.body
+
+
+  const movieImage = req.file!
+
+
 
   try {
     const movie = await Movie.findById(movieId)
@@ -121,7 +145,25 @@ export const editMovie = async (
     if (!movie) {
       res.status(404).json({ message: 'Could not find movie' })
     }
-    const updatedMovie = await Movie.findByIdAndUpdate(movieId, req.body, {
+    const data = {
+      en: {
+        movieName: movieNameEN,
+        director: directorEN,
+        description: descriptionEN,
+      },
+      ge: {
+        movieName: movieNameGE,
+        director: directorGE,
+        description: descriptionGE,
+      },
+      budget,
+      year,
+      genres: genre,
+      userId,
+      image: image? movie!.image : movieImage.path,
+    }
+
+    const updatedMovie = await Movie.findByIdAndUpdate(movieId, data, {
       new: true,
     })
     res.status(200).json({ message: 'Movie updated!', updatedMovie })
