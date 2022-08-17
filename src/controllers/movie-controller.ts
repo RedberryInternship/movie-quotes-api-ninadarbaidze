@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express'
-import { Movie, User } from 'models'
+import { Movie, User, Genre } from 'models'
 import { UserTypes } from 'types'
 
 export const getMovies = async (
@@ -23,6 +23,9 @@ export const getMovies = async (
   }
 
 }
+
+
+
 export const getMoviesById = async (
   req: Request,
   res: Response,
@@ -50,6 +53,48 @@ export const getMoviesById = async (
     next(err)
   }
   
+}
+
+export const getGenres = async (
+  _req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const genres = await Genre.find()
+      .select(['-__v', '-_id'])
+    res.status(200).json(genres)
+  } catch (err: any) {
+    if (!err.statusCode) {
+      err.statusCode = 500
+    }
+    next(err)
+  }
+
+}
+
+export const addGenres = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const {label} = req.body
+
+  try {
+    const genre = await Genre.create({
+      label,
+      value: `genres:${label}`
+
+    })
+
+    res.status(201).json({message: 'Genre Created!', genre})
+  } catch (err: any) {
+    if (!err.statusCode) {
+      err.statusCode = 500
+    }
+    next(err)
+  }
+
 }
 
 export const addMovie = async (
@@ -190,7 +235,7 @@ export const deleteMovie = async (
       res.status(404).json({ message: 'Could not find movie' })
     }
     movie!.remove()
-    res.status(200).json({ message: 'movie was deleted successfully' })
+    res.status(200).json({ message: 'Movie was deleted successfully' })
   } catch (err: any) {
     if (!err.statusCode) {
       err.statusCode = 500
