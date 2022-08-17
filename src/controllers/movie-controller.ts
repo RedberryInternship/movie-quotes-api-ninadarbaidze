@@ -13,7 +13,7 @@ export const getMovies = async (
         path: 'userId',
         select: ['-__v'],
       })
-      .select('-__v')
+      .select('-__v').sort({'createdAt': 'descending'})
     res.status(200).json(movies)
   } catch (err: any) {
     if (!err.statusCode) {

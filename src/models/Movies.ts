@@ -26,7 +26,7 @@ const movieSchema = new mongoose.Schema(
       },
     ],
   },
-  { versionKey: false }
+  { versionKey: false, timestamps: true },
 )
 
 const Movie = mongoose.model('Movie', movieSchema)
