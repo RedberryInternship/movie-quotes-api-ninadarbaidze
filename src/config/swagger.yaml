@@ -714,7 +714,7 @@ paths:
                     label: Drama
       responses:
         '201':
-          description: Created
+          description: Featured Genres - Drama, Romance, Western, Horror, Fantasy, Action, Comedy, Thriller
           content:
             application/json:
               schema:
