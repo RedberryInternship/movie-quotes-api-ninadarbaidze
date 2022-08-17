@@ -299,6 +299,82 @@ paths:
 
 
 
+  /movies:
+    get: 
+      tags:
+        - Movies
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Movie list
+          content:
+            application/json:
+              schema: 
+                type: array
+                items: 
+                  type: object
+                  properties:
+                    en:
+                      type: object
+                      properties:
+                          movieName: 
+                              type: string
+                              example: Fight Club
+                          director: 
+                              example: David Fincher
+                          description: 
+                              type: string
+                              example: Unhappy with his capitalistic lifestyle, a white-collared insomniac forms an underground fight club with Tyler, a careless soap salesman. Soon, their venture spirals down into something sinister.    
+                    ge:
+                      type: object
+                      properties:
+                        movieName: 
+                            type: string
+                            example: მებრძოლთა კლუბი
+                        director: 
+                            type: string
+                            example: დევიდ ფინჩერი
+                        description: 
+                            type: string
+                            example: ფილმის განმარტება
+                    _id: 
+                      type: string
+                      example: djsjdskjdjk32ids99nnjsdl20023
+                    image: 
+                      type: string
+                      example: images/movie-image.png
+                    budget: 
+                        type: number
+                        example: 100000000
+                    userId:
+                      type: object
+                      properties:
+                        username: 
+                            type: string
+                            example: nyx
+                        email: 
+                            type: string
+                            example: nyx@gmail.com
+                        password: 
+                            type: string
+                            example: 'nyx123'
+                        verified: 
+                            type: boolean
+                            example: true
+                        profileImage: 
+                            type: string
+                            example: images/profile-image.png
+                        genres: 
+                            type: array
+                            example: ["genres:Horror, Genres:Thriller"]
+                        movies: 
+                          type: array
+                          items: 
+                              type: string
+                              example: jsdskdskdjskjdskjdsk4343fd
+
+                                   
 
 
 
