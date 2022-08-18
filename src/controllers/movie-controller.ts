@@ -117,7 +117,6 @@ export const addMovie = async (
   const image = req.file!
 
 
-  console.log(req.body)
 
   try {
     const movie = await Movie.create({
