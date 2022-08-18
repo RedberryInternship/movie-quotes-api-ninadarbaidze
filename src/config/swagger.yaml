@@ -298,6 +298,443 @@ paths:
                     profileImage: images/profile-image.png
 
 
+  /movies/{id}:
+   get:
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            minimum: 1
+          description: movie id
+      tags:
+        - Movies
+      responses:
+        '200': 
+          description: Return movie info
+          content:
+            application/json:
+              schema: 
+                type: object
+                properties:
+                  movie:
+                    type: object
+                    properties:
+                      en:
+                        type: object
+                        properties:
+                            movieName: 
+                                type: string
+                                example: Fight Club
+                            director: 
+                                example: David Fincher
+                            description: 
+                                type: string
+                                example: Unhappy with his capitalistic lifestyle, a white-collared insomniac forms an underground fight club with Tyler, a careless soap salesman. Soon, their venture spirals down into something sinister.    
+                      ge:
+                        type: object
+                        properties:
+                          movieName: 
+                              type: string
+                              example: მებრძოლთა კლუბი
+                          director: 
+                              type: string
+                              example: დევიდ ფინჩერი
+                          description: 
+                              type: string
+                              example: ფილმის განმარტება
+                      _id: 
+                        type: string
+                        example: djsjdskjdjk32ids99nnjsdl20023
+                      image: 
+                        type: string
+                        example: images/movie-image.png
+                      budget: 
+                          type: number
+                          example: 100000000
+                      userId:
+                          type: string
+                          example: jsdskdskdjskjdskjdsk4343fd
+
+  /movies:
+    get: 
+      tags:
+        - Movies
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Movie list
+          content:
+            application/json:
+              schema: 
+                type: array
+                items: 
+                  type: object
+                  properties:
+                    en:
+                      type: object
+                      properties:
+                          movieName: 
+                              type: string
+                              example: Fight Club
+                          director: 
+                              example: David Fincher
+                          description: 
+                              type: string
+                              example: Unhappy with his capitalistic lifestyle, a white-collared insomniac forms an underground fight club with Tyler, a careless soap salesman. Soon, their venture spirals down into something sinister.    
+                    ge:
+                      type: object
+                      properties:
+                        movieName: 
+                            type: string
+                            example: მებრძოლთა კლუბი
+                        director: 
+                            type: string
+                            example: დევიდ ფინჩერი
+                        description: 
+                            type: string
+                            example: ფილმის განმარტება
+                    _id: 
+                      type: string
+                      example: 62f29441058d69678b6c6922
+                    image: 
+                      type: string
+                      example: images/movie-image.png
+                    budget: 
+                        type: number
+                        example: 100000000
+                    userId:
+                      type: object
+                      properties:
+                        username: 
+                            type: string
+                            example: nyx
+                        email: 
+                            type: string
+                            example: nyx@gmail.com
+                        password: 
+                            type: string
+                            example: 'nyx123'
+                        verified: 
+                            type: boolean
+                            example: true
+                        profileImage: 
+                            type: string
+                            example: images/profile-image.png
+                        genres: 
+                            type: array
+                            example: ["genres:Horror, Genres:Thriller"]
+                        movies: 
+                          type: array
+                          items: 
+                              type: string
+                              example: jsdskdskdjskjdskjdsk4343fd
+
+                                   
+
+
+
+
+                
+
+  /add-movie:
+    post: 
+      tags:
+        - Movies
+      security:
+        - bearerAuth: []
+      requestBody:
+            content:
+                 multipart/form-data:
+                  schema:
+                    type: object
+                    properties:
+                      movieNameEN:
+                        type: string
+                      movieNameGE:
+                        type: string
+                      directorEN:
+                        type: string
+                      directorGE:
+                        type: string
+                      descriptionEN:
+                        type: string
+                      descriptionGE:
+                        type: string
+                      budget:
+                        type: number
+                      userId:
+                        type: string
+                      year:
+                        type: number
+                      image:
+                        type: string
+                        format: binary
+                        example:
+                              genres:
+                                - genres:Thriller
+                                - genres:Drama
+                              movieNameEN: Fight Club,
+                              movieNameGE: მებრძოლთა კლუბი,
+                              directorEN: David Fincher,
+                              directorGE: დევიდ ფინჩერი,
+                              descriptionEN: Movie description,
+                              descriptionGE: ფილმის განმარტება,
+                              budget: 100000000,
+                              userId: 62f29441058d69678b6c6922,
+                              year: 1994
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Movie added successfully
+                  movie:
+                    type: object
+                    properties:
+                      en:
+                        type: object
+                        properties:
+                            movieName: 
+                                type: string
+                                example: Fight Club
+                            director: 
+                                example: David Fincher
+                            description: 
+                                type: string
+                                example: Unhappy with his capitalistic lifestyle, a white-collared insomniac forms an underground fight club with Tyler, a careless soap salesman. Soon, their venture spirals down into something sinister.    
+                      ge:
+                                type: object
+                                properties:
+                                  movieName: 
+                                      type: string
+                                      example: მებრძოლთა კლუბი
+                                  director: 
+                                      type: string
+                                      example: დევიდ ფინჩერი
+                                  description: 
+                                      type: string
+                                      example: ფილმის განმარტება
+                      _id: 
+                            type: string
+                            example: djsjdskjdjk32ids99nnjsdl20023
+                      image: 
+                            type: string
+                            example: images/movie-image.png
+                      budget: 
+                              type: number
+                              example: 100000000
+                      userId:
+                              type: string
+                              example: jsdskdskdjskjdskjdsk4343fd
+  /edit-movie/{id}:
+    patch: 
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            minimum: 1
+          description: movie id
+      tags:
+        - Movies
+      security:
+        - bearerAuth: []
+      requestBody:
+            content:
+                 multipart/form-data:
+                  schema:
+                    type: object
+                    properties:
+                      movieNameEN:
+                        type: string
+                      movieNameGE:
+                        type: string
+                      directorEN:
+                        type: string
+                      directorGE:
+                        type: string
+                      descriptionEN:
+                        type: string
+                      descriptionGE:
+                        type: string
+                      budget:
+                        type: number
+                      userId:
+                        type: string
+                      year:
+                        type: number
+                      image:
+                        type: string
+                        format: binary
+                        example:
+                              genres:
+                                - genres:Thriller
+                                - genres:Drama
+                              movieNameEN: Fight Club,
+                              movieNameGE: მებრძოლთა კლუბი,
+                              directorEN: David Fincher,
+                              directorGE: დევიდ ფინჩერი,
+                              descriptionEN: Movie description,
+                              descriptionGE: ფილმის განმარტება,
+                              budget: 100000000,
+                              userId: 62f29441058d69678b6c6922,
+                              year: 1994
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Movie updated!
+                  updatedMovie:
+                    type: object
+                    properties:
+                      en:
+                        type: object
+                        properties:
+                            movieName: 
+                                type: string
+                                example: Fight Club
+                            director: 
+                                example: David Fincher
+                            description: 
+                                type: string
+                                example: Unhappy with his capitalistic lifestyle, a white-collared insomniac forms an underground fight club with Tyler, a careless soap salesman. Soon, their venture spirals down into something sinister.    
+                      ge:
+                                type: object
+                                properties:
+                                  movieName: 
+                                      type: string
+                                      example: მებრძოლთა კლუბი
+                                  director: 
+                                      type: string
+                                      example: დევიდ ფინჩერი
+                                  description: 
+                                      type: string
+                                      example: ფილმის განმარტება
+                      _id: 
+                            type: string
+                            example: djsjdskjdjk32ids99nnjsdl20023
+                      image: 
+                            type: string
+                            example: images/movie-image.png
+                      budget: 
+                              type: number
+                              example: 100000000
+                      userId:
+                              type: string
+                              example: jsdskdskdjskjdskjdsk4343fd
+
+
+  /delete-movie:
+    delete:
+      tags:
+        - Movies
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                movieId:
+                  type: string
+                  example: 62fb74009a6cf4aa570d915a
+
+      responses:
+        '200':
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Movie was deleted successfully
+                          
+
+
+
+  /genres:
+    get:
+      tags:
+        - Movies
+      responses:
+        '200': 
+          description: Returns a list of genres
+          content:
+            application/json:
+              schema: 
+                type: array
+                items: 
+                  type: object
+                  properties:
+                    label: 
+                      type: string
+                      example: Drama
+                    value: 
+                      type: string
+                      example: genres:Drama
+
+                   
+
+
+  /add-genres:
+    post:
+      tags:
+        - Movies
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                label:
+                  type: string
+              required:
+                - label
+              example:
+                    label: Drama
+      responses:
+        '201':
+          description: Featured Genres - Drama, Romance, Western, Horror, Fantasy, Action, Comedy, Thriller
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Genre Created!"
+                  genre:
+                    type: object
+                    properties:
+                      label: 
+                        type: string
+                        example: Drama
+                      value: 
+                        type: string
+                        example: genres:Drama
+              
+                      
+
 
 
 

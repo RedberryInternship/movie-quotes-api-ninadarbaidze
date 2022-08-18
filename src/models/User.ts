@@ -1,4 +1,7 @@
 import mongoose from 'mongoose'
+const { Schema } = mongoose
+
+
 
 const signupSchema = new mongoose.Schema({
   username: {
@@ -20,6 +23,10 @@ const signupSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  movies: [{
+    type: Schema.Types.ObjectId,
+    ref: 'Movies',
+  }]
 })
 
 const User = mongoose.model('User', signupSchema)
