@@ -1,7 +1,7 @@
 name: Deploy to Server
 on:
     push: 
-        branches: [feat/cd-pipeline]
+        branches: [main]
 jobs:
     deploy:
         runs-on: ubuntu-latest
