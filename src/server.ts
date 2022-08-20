@@ -6,6 +6,7 @@ import { connectMongoose } from 'config'
 import { authRoutes } from 'routes'
 import { profileRoutes } from 'routes'
 import { MovieRoutes } from 'routes'
+import { QuoteRoutes } from 'routes'
 import cors from 'cors'
 
 const server = express();
@@ -23,6 +24,7 @@ server.use(cors())
 server.use(authRoutes)
 server.use(profileRoutes)
 server.use(MovieRoutes)
+server.use(QuoteRoutes)
 
 server.use(errorHandler)
 

@@ -1,0 +1,23 @@
+name: Deploy to Server
+on:
+    push: 
+        branches: [main]
+jobs:
+    deploy:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Deploy 
+              uses: appleboy/ssh-action@master
+              with:
+                host: ${{ secrets.SSH_HOST }}
+                key: ${{ secrets.SSH_KEY }}
+                username: ${{ secrets.SSH_USERNAME }}
+                script_stop: true
+                script: |
+                    cd apps
+                    cd movie-quotes-api-ninadarbaidze
+                    git checkout main
+                    git pull
+                    npm ci
+                    npm run build:prod
+                    pm2 restart movie-qt-api

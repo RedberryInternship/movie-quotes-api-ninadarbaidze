@@ -25,6 +25,12 @@ const movieSchema = new mongoose.Schema(
         type: Schema.Types.String,
       },
     ],
+    quotes: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: 'Quote',
+      },
+    ]
   },
   { versionKey: false, timestamps: true },
 )
