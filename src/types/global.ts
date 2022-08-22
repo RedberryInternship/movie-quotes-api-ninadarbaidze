@@ -27,3 +27,24 @@ export interface UserTypes {
     description: string
   }
 
+  export interface ServerToClientEvents {
+    noArg?: () => void;
+    basicEmit?: (a: number, b: string, c: Buffer) => void;
+    withAck?: (d: string, callback: (e: number) => void) => void;
+    emit?: (event: string, data: any) => void
+    on: (event: string, callback: (data: any)=> void) => void 
+  }
+  
+  export interface ClientToServerEvents {
+    hello: () => void;
+  }
+  
+  export interface InterServerEvents {
+    ping: () => void;
+  }
+  
+  export interface SocketData {
+    name: string;
+    age: number;
+  }
+

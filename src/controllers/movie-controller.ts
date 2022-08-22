@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express'
 import { Movie, User, Genre } from 'models'
 import { UserTypes } from 'types'
+import { getIO } from '../socket'
 
 export const getMovies = async (
   _req: Request,
@@ -13,7 +14,8 @@ export const getMovies = async (
         path: 'userId',
         select: ['-__v'],
       })
-      .select('-__v').sort({'createdAt': 'descending'})
+      .select('-__v')
+      .sort({ createdAt: 'descending' })
     res.status(200).json(movies)
   } catch (err: any) {
     if (!err.statusCode) {
@@ -21,27 +23,22 @@ export const getMovies = async (
     }
     next(err)
   }
-
 }
-
-
 
 export const getMoviesById = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
-  const {movieId} = req.params
+  const { movieId } = req.params
 
   if (!movieId.match(/^[0-9a-fA-F]{24}$/))
     res.status(422).json({ message: 'Please provide a valid id' })
 
   try {
-    const movie = await Movie.findById(movieId)
-      .select('-__v')
+    const movie = await Movie.findById(movieId).select('-__v')
 
-    if (!movie)
-      res.status(404).json({ message: 'Could not find movie' })
+    if (!movie) res.status(404).json({ message: 'Could not find movie' })
 
     res.status(200).json({
       movie,
@@ -52,7 +49,6 @@ export const getMoviesById = async (
     }
     next(err)
   }
-  
 }
 
 export const getGenres = async (
@@ -61,8 +57,7 @@ export const getGenres = async (
   next: NextFunction
 ) => {
   try {
-    const genres = await Genre.find()
-      .select(['-__v', '-_id'])
+    const genres = await Genre.find().select(['-__v', '-_id'])
     res.status(200).json(genres)
   } catch (err: any) {
     if (!err.statusCode) {
@@ -70,7 +65,6 @@ export const getGenres = async (
     }
     next(err)
   }
-
 }
 
 export const addGenres = async (
@@ -78,23 +72,21 @@ export const addGenres = async (
   res: Response,
   next: NextFunction
 ) => {
-  const {label} = req.body
+  const { label } = req.body
 
   try {
     const genre = await Genre.create({
       label,
-      value: `genres:${label}`
-
+      value: `genres:${label}`,
     })
 
-    res.status(201).json({message: 'Genre Created!', genre})
+    res.status(201).json({ message: 'Genre Created!', genre })
   } catch (err: any) {
     if (!err.statusCode) {
       err.statusCode = 500
     }
     next(err)
   }
-
 }
 
 export const addMovie = async (
@@ -112,12 +104,9 @@ export const addMovie = async (
     descriptionGE,
     budget,
     userId,
-    year
+    year,
   } = req.body
   const image = req.file!
-
-
-  console.log(req.body)
 
   try {
     const movie = await Movie.create({
@@ -142,6 +131,8 @@ export const addMovie = async (
     user.movies.push(movie)
     await user.save()
 
+    getIO().emit('movies', { action: 'create', movie: movie })
+
     res.status(201).json({
       message: 'Movie added successfully',
       movie,
@@ -154,7 +145,6 @@ export const addMovie = async (
   }
 }
 
-
 export const editMovie = async (
   req: Request,
   res: Response,
@@ -163,7 +153,7 @@ export const editMovie = async (
   const { movieId } = req.params
 
   if (!movieId.match(/^[0-9a-fA-F]{24}$/))
-  res.status(422).json({ message: 'Please provide a valid id' })
+    res.status(422).json({ message: 'Please provide a valid id' })
 
   const {
     genre,
@@ -175,14 +165,11 @@ export const editMovie = async (
     descriptionGE,
     budget,
     userId,
-    year, 
+    year,
     image,
   } = req.body
 
-
   const movieImage = req.file!
-
-
 
   try {
     const movie = await Movie.findById(movieId)
@@ -205,7 +192,7 @@ export const editMovie = async (
       year,
       genres: genre,
       userId,
-      image: image? movie!.image : movieImage.path,
+      image: image ? movie!.image : movieImage.path,
     }
 
     const updatedMovie = await Movie.findByIdAndUpdate(movieId, data, {

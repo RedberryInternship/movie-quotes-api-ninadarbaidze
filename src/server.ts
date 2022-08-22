@@ -9,6 +9,10 @@ import { MovieRoutes } from 'routes'
 import { QuoteRoutes } from 'routes'
 import cors from 'cors'
 
+import http from 'http'
+import { Server } from 'socket.io';
+
+
 const server = express();
 
 dotenv.config()
@@ -28,7 +32,12 @@ server.use(QuoteRoutes)
 
 server.use(errorHandler)
 
-server.listen(process.env.SERVER_PORT || 3001, () =>
+const listenToServer =  server.listen(process.env.SERVER_PORT || 3001, () =>
   console.log(`Server started at ${process.env.PROJECT_URL}`)
 )
 
+const io = require('./socket').init(listenToServer);
+io.on('connection', (_socket: any) => {
+  console.log('Client connected');
+  
+});

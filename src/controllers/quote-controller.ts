@@ -7,7 +7,6 @@ export const addQuote = async (
   res: Response,
   next: NextFunction
 ) => {
-  // const { quoteEN, quoteGE, movieId, userId } = req.body
   const {  movieId } = req.body
   const image = req.file!
 
