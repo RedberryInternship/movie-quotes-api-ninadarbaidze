@@ -19,6 +19,8 @@ const quoteSchema = new mongoose.Schema(
   { versionKey: false, timestamps: true },
 )
 
+
+
 const Quote = mongoose.model('Quote', quoteSchema)
 
 export default Quote

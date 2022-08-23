@@ -33,7 +33,10 @@ const movieSchema = new mongoose.Schema(
     ]
   },
   { versionKey: false, timestamps: true },
+  
 )
+
+
 
 const Movie = mongoose.model('Movie', movieSchema)
 

@@ -36,7 +36,9 @@ export const getMoviesById = async (
     res.status(422).json({ message: 'Please provide a valid id' })
 
   try {
-    const movie = await Movie.findById(movieId).select('-__v')
+    const movie = await Movie.findById(movieId)
+      .populate({ path: 'quotes', select: ['-__v'] })
+      .select('-__v')
 
     if (!movie) res.status(404).json({ message: 'Could not find movie' })
 
@@ -221,6 +223,12 @@ export const deleteMovie = async (
     if (!movie) {
       res.status(404).json({ message: 'Could not find movie' })
     }
+    const user = await User.findById(movie?.userId)
+
+    let index = user!.movies.indexOf(movieId);
+    user!.movies.splice(index, 1); 
+
+    user?.save()
     movie!.remove()
     res.status(200).json({ message: 'Movie was deleted successfully' })
   } catch (err: any) {
