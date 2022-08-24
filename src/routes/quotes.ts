@@ -1,5 +1,5 @@
 import express from 'express'
-import { addQuote, deleteQuote } from 'controllers'
+import { addQuote, deleteQuote, getQuoteById, editQuote } from 'controllers'
 import { isAuth } from 'middlewares'
 import multer from 'multer'
 
@@ -18,5 +18,8 @@ const router = express.Router()
 
 router.post('/add-quote', upload.single('image'), addQuote)
 router.delete('/delete-quote', deleteQuote)
+router.get('/quote/:quoteId', getQuoteById)
+router.patch('/edit-quote/:quoteId', isAuth,  upload.single('image'), editQuote)
+
 
 export default router
