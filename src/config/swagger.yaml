@@ -732,7 +732,231 @@ paths:
                       value: 
                         type: string
                         example: genres:Drama
-              
+
+
+  /quote/{id}:
+   get:
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            minimum: 1
+          description: quote id
+      tags:
+        - Quotes
+      security:
+        - bearerAuth: []
+      responses:
+        '200': 
+          description: Return quote info
+          content:
+            application/json:
+              schema: 
+                type: object
+                properties:
+                  quote:
+                    type: object
+                    properties:
+                      quoteEN: 
+                                type: string
+                                example: Frankly, my dear, I don't give a damn.
+                      quoteGE: 
+                                type: string
+                                example: ფრენკი, ძვირფასო, არ მაინტერესებს
+                      image: 
+                                type: string
+                                example: images/ქუოტე-image.png
+                      movieId: 
+                                type: string
+                                example: 6305133f94b0db6ac93c3353
+                      userId: 
+                                type: string
+                                example: 62f29441058d69678b6c6922
+                      createdAt: 
+                                type: string
+                                example: i2022-08-23T17:58:16.836Z
+                      updatedAt: 
+                                type: string
+                                example: i2022-08-24T14:38:35.065Z
+
+  /add-quote:
+    post: 
+      tags:
+        - Quotes
+      security:
+        - bearerAuth: []
+      requestBody:
+            content:
+                 multipart/form-data:
+                  schema:
+                    type: object
+                    properties:
+                      quoteEN:
+                        type: string
+                      quoteGE:
+                        type: string
+                      movieId:
+                        type: string
+                      userId:
+                        type: string
+                      createdAt:
+                        type: string
+                      updatedAt:
+                        type: number
+                      image:
+                        type: string
+                        format: binary
+                        example:
+                              quoteEN: Frankly, my dear, I don't give a damn
+                              quoteGE: ფრენკი, ძვირფასო, არ მაინტერესებს
+                              movieId: 6305133f94b0db6ac93c3353
+                              userId: 62f29441058d69678b6c6922
+
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Quote added successfully
+                  quote:
+                    type: object
+                    properties:
+                      quoteEN: 
+                                type: string
+                                example: Frankly, my dear, I don't give a damn.
+                      quoteGE: 
+                                type: string
+                                example: ფრენკი, ძვირფასო, არ მაინტერესებს
+                      image: 
+                                type: string
+                                example: images/ქუოტე-image.png
+                      movieId: 
+                                type: string
+                                example: 6305133f94b0db6ac93c3353
+                      userId: 
+                                type: string
+                                example: 62f29441058d69678b6c6922
+                      createdAt: 
+                                type: string
+                                example: i2022-08-23T17:58:16.836Z
+                      updatedAt: 
+                                type: string
+                                example: i2022-08-24T14:38:35.065Z
+
+  /edit-quote/{id}:
+    patch: 
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            minimum: 1
+          description: quote id
+      tags:
+        - Quotes
+      security:
+        - bearerAuth: []
+      requestBody:
+            content:
+                 multipart/form-data:
+                  schema:
+                    type: object
+                    properties:
+                      quoteEN:
+                        type: string
+                      quoteGE:
+                        type: string
+                      movieId:
+                        type: string
+                      userId:
+                        type: string
+                      createdAt:
+                        type: string
+                      updatedAt:
+                        type: number
+                      image:
+                        type: string
+                        format: binary
+                        example:
+                              quoteEN: Frankly, my dear, I don't give a damn
+                              quoteGE: ფრენკი, ძვირფასო, არ მაინტერესებს
+                              movieId: 6305133f94b0db6ac93c3353
+                              userId: 62f29441058d69678b6c6922
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Quote updated!
+                  updatedQuote:
+                    type: object
+                    properties:
+                      quoteEN: 
+                                type: string
+                                example: Frankly, my dear, I don't give a damn.
+                      quoteGE: 
+                                type: string
+                                example: ფრენკი, ძვირფასო, არ მაინტერესებს
+                      image: 
+                                type: string
+                                example: images/ქუოტე-image.png
+                      movieId: 
+                                type: string
+                                example: 6305133f94b0db6ac93c3353
+                      userId: 
+                                type: string
+                                example: 62f29441058d69678b6c6922
+                      createdAt: 
+                                type: string
+                                example: i2022-08-23T17:58:16.836Z
+                      updatedAt: 
+                                type: string
+                                example: i2022-08-24T14:38:35.065Z
+
+
+  /delete-quote:
+    delete:
+      tags:
+        - Quotes
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                quoteId:
+                  type: string
+                  example: 62fb74009a6cf4aa570d915a
+
+      responses:
+        '200':
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Quote was deleted successfully
+          
+                              
+                    
                       
 
 

@@ -16,6 +16,7 @@ jobs:
                 script: |
                     cd apps
                     cd movie-quotes-api-ninadarbaidze
+                    git checkout main
                     git pull
                     npm ci
                     npm run build:prod
