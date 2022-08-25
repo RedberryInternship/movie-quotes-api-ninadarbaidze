@@ -5,10 +5,10 @@ info:
   version: 0.1.9
 
 servers:
+  - url: https://movie-quotes-api.nina.redberryinternship.ge/
+    description: production server
   - url: http://localhost:3001/
     description: local server
-  - url: https://moviequotes-api.nina.redberryinternship.ge/
-    description: production server
 
     
 components:

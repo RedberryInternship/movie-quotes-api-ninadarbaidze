@@ -7,6 +7,7 @@ import { authRoutes } from 'routes'
 import { profileRoutes } from 'routes'
 import { MovieRoutes } from 'routes'
 import { QuoteRoutes } from 'routes'
+
 import cors from 'cors'
 
 import http from 'http'
@@ -29,6 +30,7 @@ server.use(authRoutes)
 server.use(profileRoutes)
 server.use(MovieRoutes)
 server.use(QuoteRoutes)
+
 
 server.use(errorHandler)
 

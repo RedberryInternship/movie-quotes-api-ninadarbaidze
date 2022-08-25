@@ -109,7 +109,6 @@ export const addMovie = async (
     year,
   } = req.body
   const image = req.file!
-
   try {
     const movie = await Movie.create({
       en: {
