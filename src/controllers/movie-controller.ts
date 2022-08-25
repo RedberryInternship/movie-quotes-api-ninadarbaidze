@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express'
 import { Movie, User, Genre } from 'models'
 import { UserTypes } from 'types'
-import { getIO } from '../socket'
+import { getIO } from 'socket'
 
 export const getMovies = async (
   _req: Request,
