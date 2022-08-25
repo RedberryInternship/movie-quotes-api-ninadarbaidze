@@ -16,10 +16,9 @@ const upload = multer({ storage: storageConfig })
 
 const router = express.Router()
 
-router.post('/add-quote', upload.single('image'), addQuote)
-router.delete('/delete-quote', deleteQuote)
 router.get('/quote/:quoteId', getQuoteById)
-router.patch('/edit-quote/:quoteId', isAuth,  upload.single('image'), editQuote)
-
+router.post('/add-quote', upload.single('image'), addQuote)
+router.patch('/edit-quote/:quoteId', isAuth, upload.single('image'), editQuote)
+router.delete('/delete-quote', deleteQuote)
 
 export default router

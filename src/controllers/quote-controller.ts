@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express'
-import { Movie, User, Quote } from 'models'
+import { Movie, Quote } from 'models'
 import { UserTypes } from 'types'
 
 export const addQuote = async (
