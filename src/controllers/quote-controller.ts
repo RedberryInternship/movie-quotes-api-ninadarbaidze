@@ -67,7 +67,6 @@ export const getQuoteById = async (
   next: NextFunction
 ) => {
   const { quoteId } = req.params
-  console.log(quoteId)
 
   if (!quoteId.match(/^[0-9a-fA-F]{24}$/))
     res.status(422).json({ message: 'Please provide a valid id' })
