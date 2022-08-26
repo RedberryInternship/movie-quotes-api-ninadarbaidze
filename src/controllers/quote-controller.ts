@@ -72,13 +72,44 @@ export const getQuoteById = async (
     res.status(422).json({ message: 'Please provide a valid id' })
 
   try {
-    const quote = await Quote.findById(quoteId).select('-__v')
+    const quote = await Quote.findById(quoteId)
+      .populate({
+        path: 'comments.userId',
+        select: ['username', 'profileImage'],
+      })
+      .select('-__v')
 
     if (!quote) res.status(404).json({ message: 'Could not find quote' })
 
     res.status(200).json({
       quote,
     })
+  } catch (err: any) {
+    if (!err.statusCode) {
+      err.statusCode = 500
+    }
+    next(err)
+  }
+}
+
+export const getQuotes = async (
+  _req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const quotes = await Quote.find()
+      .populate({
+        path: 'comments.userId',
+        select: ['username', 'profileImage'],
+      })
+      .populate({
+        path: 'movieId',
+        select: ['en.movieName', 'ge.movieName', 'year'],
+      })
+      .select('-__v')
+      .sort({ createdAt: 'descending' })
+    res.status(200).json(quotes)
   } catch (err: any) {
     if (!err.statusCode) {
       err.statusCode = 500
@@ -117,6 +148,62 @@ export const editQuote = async (
       new: true,
     })
     res.status(200).json({ message: 'Quote updated!', updatedQuote })
+  } catch (err: any) {
+    if (!err.statusCode) {
+      err.statusCode = 500
+    }
+    next(err)
+  }
+}
+
+export const addComment = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const { quoteId, userId, comment } = req.body
+
+  try {
+    const quote = await Quote.findById(quoteId)
+
+    const commentData = {
+      comment,
+      userId,
+    }
+
+    quote!.comments.push(commentData)
+
+    await quote!.save()
+    res.status(201).json({
+      message: 'Comment added successfully',
+      quote,
+    })
+  } catch (err: any) {
+    if (!err.statusCode) {
+      err.statusCode = 500
+    }
+    next(err)
+  }
+}
+
+export const addLike = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const { quoteId, userId } = req.body
+
+  try {
+    const quote = await Quote.findById(quoteId)
+    console.log(req.body)
+
+    quote!.likes.push(userId)
+
+    await quote!.save()
+    res.status(201).json({
+      message: 'Liked successfully',
+      quote,
+    })
   } catch (err: any) {
     if (!err.statusCode) {
       err.statusCode = 500

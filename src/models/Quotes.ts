@@ -14,6 +14,23 @@ const quoteSchema = new mongoose.Schema(
       type: Schema.Types.ObjectId,
       ref: 'User',
     },
+    likes: [
+      {
+          type: Schema.Types.ObjectId,
+          ref: 'User',
+
+      }
+    ],
+    comments: [
+      {
+        comment: Schema.Types.String,
+        userId: {
+          type: Schema.Types.ObjectId,
+          ref: 'User',
+        }
+
+      }
+    ]
     
   },
   { versionKey: false, timestamps: true },
