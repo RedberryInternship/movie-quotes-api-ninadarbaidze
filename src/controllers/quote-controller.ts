@@ -1,6 +1,8 @@
 import { Request, Response, NextFunction } from 'express'
 import { Movie, Quote } from 'models'
 import { UserTypes } from 'types'
+import { getIO } from 'socket'
+import mongoose from 'mongoose'
 
 export const addQuote = async (
   req: Request,
@@ -19,6 +21,18 @@ export const addQuote = async (
     const movie = (await Movie.findById(movieId)) as UserTypes | any
     movie.quotes.unshift(quote)
     await movie.save()
+
+    const newQuote = await Quote.findById(quote._id)
+      .populate({
+        path: 'comments.userId',
+        select: ['username', 'profileImage'],
+      })
+      .populate({
+        path: 'movieId',
+        select: ['en.movieName', 'ge.movieName', 'year'],
+      })
+
+    getIO().emit('quotes', { action: 'create', quote: newQuote })
 
     res.status(201).json({
       message: 'Quote added successfully',
@@ -51,7 +65,7 @@ export const deleteQuote = async (
     let index = movie!.quotes.indexOf(quoteId)
     movie!.quotes.splice(index, 1)
     movie?.save()
-    quote!.remove()
+    await quote!.remove()
     res.status(200).json({ message: 'Quote was deleted successfully' })
   } catch (err: any) {
     if (!err.statusCode) {
@@ -195,11 +209,23 @@ export const addLike = async (
 
   try {
     const quote = await Quote.findById(quoteId)
-    console.log(req.body)
+    const alreadyLiked = quote?.likes.find(user => user.toString() === userId)
 
-    quote!.likes.push(userId)
 
-    await quote!.save()
+    if(alreadyLiked) {
+      let index =  quote!.likes.indexOf(userId)
+      quote?.likes.splice(index, 1)
+      await quote?.save()
+      res.status(201).json({
+        message: 'Unliked successfully',
+        quote,
+      })
+    } else {
+      quote!.likes.push(userId)
+      await quote!.save()
+
+    }
+
     res.status(201).json({
       message: 'Liked successfully',
       quote,
