@@ -2,7 +2,6 @@ import { Request, Response, NextFunction } from 'express'
 import { Movie, Quote } from 'models'
 import { UserTypes } from 'types'
 import { getIO } from 'socket'
-import mongoose from 'mongoose'
 
 export const addQuote = async (
   req: Request,
@@ -28,9 +27,14 @@ export const addQuote = async (
         select: ['username', 'profileImage'],
       })
       .populate({
+        path: 'userId',
+        // select: ['en.movieName', 'ge.movieName', 'year'],
+      })
+      .populate({
         path: 'movieId',
         select: ['en.movieName', 'ge.movieName', 'year'],
       })
+   
 
     getIO().emit('quotes', { action: 'create', quote: newQuote })
 
@@ -107,10 +111,12 @@ export const getQuoteById = async (
 }
 
 export const getQuotes = async (
-  _req: Request,
+  req: Request,
   res: Response,
   next: NextFunction
 ) => {
+  const page = parseInt(req.query.page as string || '0') 
+  const PAGE_SIZE = 3
   try {
     const quotes = await Quote.find()
       .populate({
@@ -121,8 +127,13 @@ export const getQuotes = async (
         path: 'movieId',
         select: ['en.movieName', 'ge.movieName', 'year'],
       })
+      .populate({
+        path: 'userId',
+        select: ['username', 'profileImage'],
+      })
       .select('-__v')
       .sort({ createdAt: 'descending' })
+      .limit(PAGE_SIZE * page)
     res.status(200).json(quotes)
   } catch (err: any) {
     if (!err.statusCode) {
@@ -179,15 +190,31 @@ export const addComment = async (
 
   try {
     const quote = await Quote.findById(quoteId)
-
+    
+    .populate({
+      path: 'userId',
+      select: ['username', 'profileImage'],
+    })
     const commentData = {
       comment,
       userId,
     }
 
     quote!.comments.push(commentData)
-
     await quote!.save()
+
+    const newQuote = await Quote.findById(quoteId)
+    .populate({
+      path: 'comments.userId',
+      select: ['username', 'profileImage'],
+    })
+    .populate({
+      path: 'movieId',
+      select: ['en.movieName', 'ge.movieName', 'year'],
+    })
+
+    // getIO().emit('comment', { action: 'addComment', comment: newQuote!.comments[quote!.comments.length - 1], quantity: newQuote?.comments.length })
+    getIO().emit('quotes', { action: 'addComment', quote: newQuote,  })
     res.status(201).json({
       message: 'Comment added successfully',
       quote,
@@ -216,6 +243,8 @@ export const addLike = async (
       let index =  quote!.likes.indexOf(userId)
       quote?.likes.splice(index, 1)
       await quote?.save()
+      getIO().emit('quotes', { action: 'dislike', likes: quote!.likes, id: quote!._id  })
+
       res.status(201).json({
         message: 'Unliked successfully',
         quote,
@@ -223,8 +252,11 @@ export const addLike = async (
     } else {
       quote!.likes.push(userId)
       await quote!.save()
+      getIO().emit('quotes', { action: 'like', likes: quote!.likes, id: quote!._id  })
 
     }
+
+
 
     res.status(201).json({
       message: 'Liked successfully',
