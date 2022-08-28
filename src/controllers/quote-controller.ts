@@ -34,7 +34,6 @@ export const addQuote = async (
         path: 'movieId',
         select: ['en.movieName', 'ge.movieName', 'year'],
       })
-   
 
     getIO().emit('quotes', { action: 'create', quote: newQuote })
 
@@ -115,7 +114,7 @@ export const getQuotes = async (
   res: Response,
   next: NextFunction
 ) => {
-  const page = parseInt(req.query.page as string || '0') 
+  const page = parseInt((req.query.page as string) || '0')
   const PAGE_SIZE = 3
   try {
     const quotes = await Quote.find()
@@ -134,7 +133,67 @@ export const getQuotes = async (
       .select('-__v')
       .sort({ createdAt: 'descending' })
       .limit(PAGE_SIZE * page)
-    res.status(200).json(quotes)
+    const total = await Quote.countDocuments()
+
+    res.status(200).json({ quotes, total })
+  } catch (err: any) {
+    if (!err.statusCode) {
+      err.statusCode = 500
+    }
+    next(err)
+  }
+}
+
+export const searchQuotes = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const { queryName, queryType } = req.query
+
+  const searchInMovies = queryType === 'movies'
+
+  const regex = new RegExp(queryName as string, 'i')
+  const page = parseInt((req.query.page as string) || '0')
+  const PAGE_SIZE = 3
+
+  console.log(queryName, queryType)
+
+  try {
+    const movies = await Movie.find({
+      $or: [
+        { 'en.movieName': { $regex: regex } },
+        { 'ge.movieName': { $regex: regex } },
+      ],
+    }).select('quotes')
+    const quoteIds = movies[0].quotes
+
+    const quotes = 
+        await Quote.find(searchInMovies ? {
+          _id: { $in: quoteIds },
+        }: {
+          $or: [{ quoteEN: { $regex: regex } }, { quoteGE: { $regex: regex } }],
+        })
+
+          .populate({
+            path: 'comments.userId',
+            select: ['username', 'profileImage'],
+          })
+          .populate({
+            path: 'movieId',
+            select: ['en.movieName', 'ge.movieName', 'year'],
+          })
+          .populate({
+            path: 'userId',
+            select: ['username', 'profileImage'],
+          })
+          .select('-__v')
+          .sort({ createdAt: 'descending' })
+          .limit(PAGE_SIZE * page)
+
+    const total = quotes.length
+
+    res.status(200).json({ quotes, total })
   } catch (err: any) {
     if (!err.statusCode) {
       err.statusCode = 500
@@ -189,9 +248,7 @@ export const addComment = async (
   const { quoteId, userId, comment } = req.body
 
   try {
-    const quote = await Quote.findById(quoteId)
-    
-    .populate({
+    const quote = await Quote.findById(quoteId).populate({
       path: 'userId',
       select: ['username', 'profileImage'],
     })
@@ -204,17 +261,17 @@ export const addComment = async (
     await quote!.save()
 
     const newQuote = await Quote.findById(quoteId)
-    .populate({
-      path: 'comments.userId',
-      select: ['username', 'profileImage'],
-    })
-    .populate({
-      path: 'movieId',
-      select: ['en.movieName', 'ge.movieName', 'year'],
-    })
+      .populate({
+        path: 'comments.userId',
+        select: ['username', 'profileImage'],
+      })
+      .populate({
+        path: 'movieId',
+        select: ['en.movieName', 'ge.movieName', 'year'],
+      })
 
     // getIO().emit('comment', { action: 'addComment', comment: newQuote!.comments[quote!.comments.length - 1], quantity: newQuote?.comments.length })
-    getIO().emit('quotes', { action: 'addComment', quote: newQuote,  })
+    getIO().emit('quotes', { action: 'addComment', quote: newQuote })
     res.status(201).json({
       message: 'Comment added successfully',
       quote,
@@ -236,14 +293,17 @@ export const addLike = async (
 
   try {
     const quote = await Quote.findById(quoteId)
-    const alreadyLiked = quote?.likes.find(user => user.toString() === userId)
+    const alreadyLiked = quote?.likes.find((user) => user.toString() === userId)
 
-
-    if(alreadyLiked) {
-      let index =  quote!.likes.indexOf(userId)
+    if (alreadyLiked) {
+      let index = quote!.likes.indexOf(userId)
       quote?.likes.splice(index, 1)
       await quote?.save()
-      getIO().emit('quotes', { action: 'dislike', likes: quote!.likes, id: quote!._id  })
+      getIO().emit('quotes', {
+        action: 'dislike',
+        likes: quote!.likes,
+        id: quote!._id,
+      })
 
       res.status(201).json({
         message: 'Unliked successfully',
@@ -252,11 +312,12 @@ export const addLike = async (
     } else {
       quote!.likes.push(userId)
       await quote!.save()
-      getIO().emit('quotes', { action: 'like', likes: quote!.likes, id: quote!._id  })
-
+      getIO().emit('quotes', {
+        action: 'like',
+        likes: quote!.likes,
+        id: quote!._id,
+      })
     }
-
-
 
     res.status(201).json({
       message: 'Liked successfully',
