@@ -32,7 +32,7 @@ router.post('/add-quote', isAuth, upload.single('image'), addQuote)
 router.patch('/edit-quote/:quoteId', isAuth, upload.single('image'), editQuote)
 router.delete('/delete-quote', isAuth, deleteQuote)
 
-router.post('/add-comment', isAuth, addComment)
-router.post('/add-like', isAuth, addLike)
+router.post('/add-comment', addComment)
+router.post('/add-like', addLike)
 
 export default router

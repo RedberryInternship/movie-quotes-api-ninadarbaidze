@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express'
-import { Movie, Quote } from 'models'
+import { Movie, Quote, Notification } from 'models'
 import { UserTypes } from 'types'
 import { getIO } from 'socket'
 
@@ -163,7 +163,7 @@ export const searchQuotes = async (
         { 'ge.movieName': { $regex: regex } },
       ],
     }).select('quotes')
-    const quoteIds = movies[0].quotes
+    const quoteIds = searchInMovies && movies[0].quotes
 
     const quotes = await Quote.find(
       searchInMovies
@@ -314,17 +314,25 @@ export const addLike = async (
     } else {
       quote!.likes.push(userId)
       await quote!.save()
+      await Notification.create({
+        receiverId: quote?.userId,
+        senderId: userId,
+        quoteId,
+        type: 'like'
+      })
       getIO().emit('quotes', {
         action: 'like',
         likes: quote!.likes,
         id: quote!._id,
       })
+  
+      res.status(201).json({
+        message: 'Liked successfully',
+        quote,
+      })
     }
 
-    res.status(201).json({
-      message: 'Liked successfully',
-      quote,
-    })
+  
   } catch (err: any) {
     if (!err.statusCode) {
       err.statusCode = 500
