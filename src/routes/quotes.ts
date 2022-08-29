@@ -1,5 +1,14 @@
 import express from 'express'
-import { addQuote, deleteQuote, getQuoteById, editQuote, addComment, addLike, getQuotes, searchQuotes } from 'controllers'
+import {
+  addQuote,
+  deleteQuote,
+  getQuoteById,
+  editQuote,
+  addComment,
+  addLike,
+  getQuotes,
+  searchQuotes,
+} from 'controllers'
 import { isAuth } from 'middlewares'
 import multer from 'multer'
 
@@ -16,14 +25,14 @@ const upload = multer({ storage: storageConfig })
 
 const router = express.Router()
 
-router.get('/quotes', getQuotes)
-router.get('/search-quotes', searchQuotes)
+router.get('/quotes', isAuth, getQuotes)
+router.get('/search-quotes', isAuth, searchQuotes)
 router.get('/quote/:quoteId', getQuoteById)
-router.post('/add-quote', upload.single('image'), addQuote)
+router.post('/add-quote', isAuth, upload.single('image'), addQuote)
 router.patch('/edit-quote/:quoteId', isAuth, upload.single('image'), editQuote)
-router.delete('/delete-quote', deleteQuote)
+router.delete('/delete-quote', isAuth, deleteQuote)
 
-router.post('/add-comment', addComment)
-router.post('/add-like', addLike)
+router.post('/add-comment', isAuth, addComment)
+router.post('/add-like', isAuth, addLike)
 
 export default router

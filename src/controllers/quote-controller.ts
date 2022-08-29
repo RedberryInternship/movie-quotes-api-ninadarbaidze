@@ -28,7 +28,6 @@ export const addQuote = async (
       })
       .populate({
         path: 'userId',
-        // select: ['en.movieName', 'ge.movieName', 'year'],
       })
       .populate({
         path: 'movieId',
@@ -157,8 +156,6 @@ export const searchQuotes = async (
   const page = parseInt((req.query.page as string) || '0')
   const PAGE_SIZE = 3
 
-  console.log(queryName, queryType)
-
   try {
     const movies = await Movie.find({
       $or: [
@@ -168,28 +165,34 @@ export const searchQuotes = async (
     }).select('quotes')
     const quoteIds = movies[0].quotes
 
-    const quotes = 
-        await Quote.find(searchInMovies ? {
-          _id: { $in: quoteIds },
-        }: {
-          $or: [{ quoteEN: { $regex: regex } }, { quoteGE: { $regex: regex } }],
-        })
+    const quotes = await Quote.find(
+      searchInMovies
+        ? {
+            _id: { $in: quoteIds },
+          }
+        : {
+            $or: [
+              { quoteEN: { $regex: regex } },
+              { quoteGE: { $regex: regex } },
+            ],
+          }
+    )
 
-          .populate({
-            path: 'comments.userId',
-            select: ['username', 'profileImage'],
-          })
-          .populate({
-            path: 'movieId',
-            select: ['en.movieName', 'ge.movieName', 'year'],
-          })
-          .populate({
-            path: 'userId',
-            select: ['username', 'profileImage'],
-          })
-          .select('-__v')
-          .sort({ createdAt: 'descending' })
-          .limit(PAGE_SIZE * page)
+      .populate({
+        path: 'comments.userId',
+        select: ['username', 'profileImage'],
+      })
+      .populate({
+        path: 'movieId',
+        select: ['en.movieName', 'ge.movieName', 'year'],
+      })
+      .populate({
+        path: 'userId',
+        select: ['username', 'profileImage'],
+      })
+      .select('-__v')
+      .sort({ createdAt: 'descending' })
+      .limit(PAGE_SIZE * page)
 
     const total = quotes.length
 
@@ -270,7 +273,6 @@ export const addComment = async (
         select: ['en.movieName', 'ge.movieName', 'year'],
       })
 
-    // getIO().emit('comment', { action: 'addComment', comment: newQuote!.comments[quote!.comments.length - 1], quantity: newQuote?.comments.length })
     getIO().emit('quotes', { action: 'addComment', quote: newQuote })
     res.status(201).json({
       message: 'Comment added successfully',

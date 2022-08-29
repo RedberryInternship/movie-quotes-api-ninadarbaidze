@@ -734,6 +734,94 @@ paths:
                         example: genres:Drama
 
 
+
+  /quotes:
+    get: 
+      tags:
+        - Quotes
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Quote list
+          content:
+            application/json:
+              schema: 
+                    type: object
+                    properties:
+                      quote:
+                        type: array
+                        items:
+                          type: object
+                          properties:  
+                            quoteEN: 
+                                type: string
+                                example: Frankly, my dear, I don't give a damn.
+                            quoteGE: 
+                                type: string
+                                example: ფრენკი, ძვირფასო, არ მაინტერესებს
+                            image: 
+                                type: string
+                                example: images/ქუოტე-image.png
+                            movieId: 
+                                type: object
+                                properties:
+                                  en:
+                                    type: object
+                                    properties:
+                                      movieName: 
+                                        type: string
+                                        example: Fight club
+                                  ge:
+                                    type: object
+                                    properties:
+                                      movieName: 
+                                        type: string
+                                        example: მებრძოლთა კლუბი
+                                  year: 
+                                    type: number
+                                    example: 1999
+
+                            userId: 
+                                type: object
+                                properties:
+                                  username:
+                                    type: string
+                                    example: nyx1235
+                                  profileImage:
+                                    type: string
+                                    example: images/1660919165517-logo.png
+                            likes:
+                              type: array
+                              items:
+                                type: string
+                                example: 6305133f94b0db6ac93c3353
+                            comments:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  comments:
+                                    type: string
+                                    example: I love that film!
+                                  userId:
+                                    type: object
+                                    properties:
+                                      username: 
+                                        type: string
+                                        example: nyx1235
+                                      profileImage: 
+                                        type: string
+                                        example: images/1660919165517-logo.png
+                            createdAt: 
+                                type: string
+                                example: i2022-08-23T17:58:16.836Z
+                            updatedAt: 
+                                type: string
+                                example: i2022-08-24T14:38:35.065Z
+                    
+
+
   /quote/{id}:
    get:
       parameters:
@@ -774,6 +862,28 @@ paths:
                       userId: 
                                 type: string
                                 example: 62f29441058d69678b6c6922
+                      likes:
+                              type: array
+                              items:
+                                type: string
+                                example: 6305133f94b0db6ac93c3353
+                      comments:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  comments:
+                                    type: string
+                                    example: I love that film!
+                                  userId:
+                                    type: object
+                                    properties:
+                                      username: 
+                                        type: string
+                                        example: nyx1235
+                                      profileImage: 
+                                        type: string
+                                        example: images/1660919165517-logo.png
                       createdAt: 
                                 type: string
                                 example: i2022-08-23T17:58:16.836Z
@@ -956,8 +1066,300 @@ paths:
                     example: Quote was deleted successfully
           
                               
-                    
+  /search-quotes:
+    get: 
+      parameters:
+        - in: query
+          name: queryName
+          schema:
+            type: string
+        - in: query
+          name: queryType
+          schema:
+            type: string
+      tags:
+        - Quotes
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Quote list
+          content:
+            application/json:
+              schema: 
+                    type: object
+                    properties:
+                      quote:
+                        type: array
+                        items:
+                          type: object
+                          properties:  
+                            quoteEN: 
+                                type: string
+                                example: Frankly, my dear, I don't give a damn.
+                            quoteGE: 
+                                type: string
+                                example: ფრენკი, ძვირფასო, არ მაინტერესებს
+                            image: 
+                                type: string
+                                example: images/ქუოტე-image.png
+                            movieId: 
+                                type: object
+                                properties:
+                                  en:
+                                    type: object
+                                    properties:
+                                      movieName: 
+                                        type: string
+                                        example: Fight club
+                                  ge:
+                                    type: object
+                                    properties:
+                                      movieName: 
+                                        type: string
+                                        example: მებრძოლთა კლუბი
+                                  year: 
+                                    type: number
+                                    example: 1999
+
+                            userId: 
+                                type: object
+                                properties:
+                                  username:
+                                    type: string
+                                    example: nyx1235
+                                  profileImage:
+                                    type: string
+                                    example: images/1660919165517-logo.png
+                            likes:
+                              type: array
+                              items:
+                                type: string
+                                example: 6305133f94b0db6ac93c3353
+                            comments:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  comments:
+                                    type: string
+                                    example: I love that film!
+                                  userId:
+                                    type: object
+                                    properties:
+                                      username: 
+                                        type: string
+                                        example: nyx1235
+                                      profileImage: 
+                                        type: string
+                                        example: images/1660919165517-logo.png
+                            createdAt: 
+                                type: string
+                                example: i2022-08-23T17:58:16.836Z
+                            updatedAt: 
+                                type: string
+                                example: i2022-08-24T14:38:35.065Z
+  /add-comment:
+    post:
+      tags:
+        - Quotes
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                quoteId:
+                  type: string
+                  example: 62fb74009a6cf4aa570d915a
+                userId:
+                  type: string
+                  example: 6305133f94b0db6ac93c3353
+                comment:
+                  type: string
+                  example: This is cool
+
+      responses:
+        '201':
+          description: Quote commented
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Comment added successfully
+                  quote:
+                    type: object
+                    properties:
+                            quoteEN: 
+                                type: string
+                                example: Frankly, my dear, I don't give a damn.
+                            quoteGE: 
+                                type: string
+                                example: ფრენკი, ძვირფასო, არ მაინტერესებს
+                            image: 
+                                type: string
+                                example: images/ქუოტე-image.png
+                            movieId: 
+                                type: object
+                                properties:
+                                  en:
+                                    type: object
+                                    properties:
+                                      movieName: 
+                                        type: string
+                                        example: Fight club
+                                  ge:
+                                    type: object
+                                    properties:
+                                      movieName: 
+                                        type: string
+                                        example: მებრძოლთა კლუბი
+                                  year: 
+                                    type: number
+                                    example: 1999
+
+                            userId: 
+                                type: object
+                                properties:
+                                  username:
+                                    type: string
+                                    example: nyx1235
+                                  profileImage:
+                                    type: string
+                                    example: images/1660919165517-logo.png
+                            likes:
+                              type: array
+                              items:
+                                type: string
+                                example: 6305133f94b0db6ac93c3353
+                            comments:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  comments:
+                                    type: string
+                                    example: I love that film!
+                                  userId:
+                                    type: object
+                                    properties:
+                                      username: 
+                                        type: string
+                                        example: nyx1235
+                                      profileImage: 
+                                        type: string
+                                        example: images/1660919165517-logo.png
+                            createdAt: 
+                                type: string
+                                example: i2022-08-23T17:58:16.836Z
+                            updatedAt: 
+                                type: string
+                                example: i2022-08-24T14:38:35.065Z
+  /add-like:
+    post:
+      tags:
+        - Quotes
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                quoteId:
+                  type: string
+                  example: 62fb74009a6cf4aa570d915a
+                userId:
+                  type: string
+                  example: 6305133f94b0db6ac93c3353
+
+      responses:
+        '201':
+          description: Post liked
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Liked successfully
+                  quote:
+                    type: object
+                    properties:
+                            quoteEN: 
+                                type: string
+                                example: Frankly, my dear, I don't give a damn.
+                            quoteGE: 
+                                type: string
+                                example: ფრენკი, ძვირფასო, არ მაინტერესებს
+                            image: 
+                                type: string
+                                example: images/ქუოტე-image.png
+                            movieId: 
+                                type: object
+                                properties:
+                                  en:
+                                    type: object
+                                    properties:
+                                      movieName: 
+                                        type: string
+                                        example: Fight club
+                                  ge:
+                                    type: object
+                                    properties:
+                                      movieName: 
+                                        type: string
+                                        example: მებრძოლთა კლუბი
+                                  year: 
+                                    type: number
+                                    example: 1999
+
+                            userId: 
+                                type: object
+                                properties:
+                                  username:
+                                    type: string
+                                    example: nyx1235
+                                  profileImage:
+                                    type: string
+                                    example: images/1660919165517-logo.png
+                            likes:
+                              type: array
+                              items:
+                                type: string
+                                example: 6305133f94b0db6ac93c3353
+                            comments:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  comments:
+                                    type: string
+                                    example: I love that film!
+                                  userId:
+                                    type: object
+                                    properties:
+                                      username: 
+                                        type: string
+                                        example: nyx1235
+                                      profileImage: 
+                                        type: string
+                                        example: images/1660919165517-logo.png
+                            createdAt: 
+                                type: string
+                                example: i2022-08-23T17:58:16.836Z
+                            updatedAt: 
+                                type: string
+                                example: i2022-08-24T14:38:35.065Z
                       
+                        
 
 
 
