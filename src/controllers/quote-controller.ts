@@ -272,8 +272,15 @@ export const addComment = async (
         path: 'movieId',
         select: ['en.movieName', 'ge.movieName', 'year'],
       })
+    await Notification.create({
+        receiverId: quote?.userId,
+        senderId: userId,
+        quoteId,
+        type: 'comment'
+      })
 
     getIO().emit('quotes', { action: 'addComment', quote: newQuote })
+
     res.status(201).json({
       message: 'Comment added successfully',
       quote,
