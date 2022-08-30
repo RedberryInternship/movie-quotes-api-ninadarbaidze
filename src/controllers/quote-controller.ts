@@ -272,12 +272,16 @@ export const addComment = async (
         path: 'movieId',
         select: ['en.movieName', 'ge.movieName', 'year'],
       })
-    await Notification.create({
+
+    if(quote?.userId?._id.toString() !== userId) {
+
+      await Notification.create({
         receiverId: quote?.userId,
         senderId: userId,
         quoteId,
-        type: 'comment'
+        type: 'comment',
       })
+    }
 
     getIO().emit('quotes', { action: 'addComment', quote: newQuote })
 
@@ -321,25 +325,25 @@ export const addLike = async (
     } else {
       quote!.likes.push(userId)
       await quote!.save()
-      await Notification.create({
-        receiverId: quote?.userId,
-        senderId: userId,
-        quoteId,
-        type: 'like'
-      })
+      if (quote?.userId?.toString() !== userId) {
+        await Notification.create({
+          receiverId: quote?.userId,
+          senderId: userId,
+          quoteId,
+          type: 'like',
+        })
+      }
       getIO().emit('quotes', {
         action: 'like',
         likes: quote!.likes,
         id: quote!._id,
       })
-  
+
       res.status(201).json({
         message: 'Liked successfully',
         quote,
       })
     }
-
-  
   } catch (err: any) {
     if (!err.statusCode) {
       err.statusCode = 500
