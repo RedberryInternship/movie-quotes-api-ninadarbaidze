@@ -38,6 +38,7 @@ export const readNotifications = async (
 
     }
     await notifications!.updateOne({ isRead: true })
+
     res.status(200).json({message: 'Notification marked as read'})
   } catch (err: any) {
     if (!err.statusCode) {
@@ -46,3 +47,20 @@ export const readNotifications = async (
     next(err)
   }
 }
+
+
+export const deleteAll = async (
+    _req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+       await Notification.deleteMany()
+      res.status(200).json({message: "Notifications deleted successfully"})
+    } catch (err: any) {
+      if (!err.statusCode) {
+        err.statusCode = 500
+      }
+      next(err)
+    }
+  }

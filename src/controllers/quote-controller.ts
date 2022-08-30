@@ -306,7 +306,7 @@ export const addLike = async (
 
   try {
     const quote = await Quote.findById(quoteId)
-    const alreadyLiked = quote?.likes.find((user) => user.toString() === userId)
+    const alreadyLiked = quote.likes.length > 0 && quote?.likes.find((user) => user.toString() === userId)
 
     if (alreadyLiked) {
       let index = quote!.likes.indexOf(userId)
@@ -333,10 +333,19 @@ export const addLike = async (
           type: 'like',
         })
       }
+
+      const notifications = await Notification.find()  
+      .populate({
+        path: 'senderId',
+        select: ['username', 'profileImage'],
+      })
+      .sort({ createdAt: 'descending' })    
+
       getIO().emit('quotes', {
         action: 'like',
         likes: quote!.likes,
         id: quote!._id,
+        notifications: notifications
       })
 
       res.status(201).json({
