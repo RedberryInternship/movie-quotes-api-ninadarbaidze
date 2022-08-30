@@ -283,7 +283,14 @@ export const addComment = async (
       })
     }
 
-    getIO().emit('quotes', { action: 'addComment', quote: newQuote })
+    const notifications = await Notification.find()  
+      .populate({
+        path: 'senderId',
+        select: ['username', 'profileImage'],
+      })
+      .sort({ createdAt: 'descending' })    
+
+    getIO().emit('quotes', { action: 'addComment', quote: newQuote, notifications })
 
     res.status(201).json({
       message: 'Comment added successfully',
