@@ -66,6 +66,7 @@ export const deleteAll = async (
   ) => {
     try {
        await Notification.deleteMany()
+       getIO().emit('quotes', { action: 'deleteAll', notifications: [] })
       res.status(200).json({message: "Notifications deleted successfully"})
     } catch (err: any) {
       if (!err.statusCode) {
