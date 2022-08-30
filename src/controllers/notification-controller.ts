@@ -39,6 +39,16 @@ export const readNotifications = async (
     }
     await notifications!.updateOne({ isRead: true })
 
+
+    const notification = await Notification.find()  
+      .populate({
+        path: 'senderId',
+        select: ['username', 'profileImage'],
+      })
+      .sort({ createdAt: 'descending' }) 
+
+    getIO().emit('quotes', { action: 'isRead', notifications: notification })
+
     res.status(200).json({message: 'Notification marked as read'})
   } catch (err: any) {
     if (!err.statusCode) {
