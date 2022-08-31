@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express'
-import { Movie, Quote } from 'models'
+import { Movie, Quote, Notification } from 'models'
 import { UserTypes } from 'types'
 import { getIO } from 'socket'
 
@@ -163,7 +163,7 @@ export const searchQuotes = async (
         { 'ge.movieName': { $regex: regex } },
       ],
     }).select('quotes')
-    const quoteIds = movies[0].quotes
+    const quoteIds = searchInMovies && movies[0].quotes
 
     const quotes = await Quote.find(
       searchInMovies
@@ -273,7 +273,28 @@ export const addComment = async (
         select: ['en.movieName', 'ge.movieName', 'year'],
       })
 
-    getIO().emit('quotes', { action: 'addComment', quote: newQuote })
+    if (quote?.userId?._id.toString() !== userId) {
+      await Notification.create({
+        receiverId: quote?.userId,
+        senderId: userId,
+        quoteId,
+        type: 'comment',
+      })
+    }
+
+    const notifications = await Notification.find()
+      .populate({
+        path: 'senderId',
+        select: ['username', 'profileImage'],
+      })
+      .sort({ createdAt: 'descending' })
+
+    getIO().emit('quotes', {
+      action: 'addComment',
+      quote: newQuote,
+      notifications,
+    })
+
     res.status(201).json({
       message: 'Comment added successfully',
       quote,
@@ -294,8 +315,15 @@ export const addLike = async (
   const { quoteId, userId } = req.body
 
   try {
+    if (!userId) {
+      return res.status(404).json({
+        message: 'User does not exists',
+      })
+    }
     const quote = await Quote.findById(quoteId)
-    const alreadyLiked = quote?.likes.find((user) => user.toString() === userId)
+    const alreadyLiked =
+      quote!.likes.length > 0 &&
+      quote?.likes.find((user) => user.toString() === userId)
 
     if (alreadyLiked) {
       let index = quote!.likes.indexOf(userId)
@@ -314,17 +342,34 @@ export const addLike = async (
     } else {
       quote!.likes.push(userId)
       await quote!.save()
+      if (quote?.userId?.toString() !== userId) {
+        await Notification.create({
+          receiverId: quote?.userId,
+          senderId: userId,
+          quoteId,
+          type: 'like',
+        })
+      }
+
+      const notifications = await Notification.find()
+        .populate({
+          path: 'senderId',
+          select: ['username', 'profileImage'],
+        })
+        .sort({ createdAt: 'descending' })
+
       getIO().emit('quotes', {
         action: 'like',
         likes: quote!.likes,
         id: quote!._id,
+        notifications: notifications,
+      })
+
+      res.status(201).json({
+        message: 'Liked successfully',
+        quote,
       })
     }
-
-    res.status(201).json({
-      message: 'Liked successfully',
-      quote,
-    })
   } catch (err: any) {
     if (!err.statusCode) {
       err.statusCode = 500

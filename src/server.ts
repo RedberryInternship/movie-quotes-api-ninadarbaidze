@@ -3,15 +3,10 @@ import bodyParser from 'body-parser'
 import dotenv from 'dotenv'
 import { swaggerMiddleware, errorHandler } from 'middlewares'
 import { connectMongoose } from 'config'
-import { authRoutes } from 'routes'
-import { profileRoutes } from 'routes'
-import { MovieRoutes } from 'routes'
 import { QuoteRoutes } from 'routes'
-
+import { authRoutes, profileRoutes, MovieRoutes, NotificationRoutes } from 'routes'
 import cors from 'cors'
 
-import http from 'http'
-import { Server } from 'socket.io';
 
 
 const server = express();
@@ -30,6 +25,7 @@ server.use(authRoutes)
 server.use(profileRoutes)
 server.use(MovieRoutes)
 server.use(QuoteRoutes)
+server.use(NotificationRoutes)
 
 
 server.use(errorHandler)
