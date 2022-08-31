@@ -273,8 +273,7 @@ export const addComment = async (
         select: ['en.movieName', 'ge.movieName', 'year'],
       })
 
-    if(quote?.userId?._id.toString() !== userId) {
-
+    if (quote?.userId?._id.toString() !== userId) {
       await Notification.create({
         receiverId: quote?.userId,
         senderId: userId,
@@ -283,14 +282,18 @@ export const addComment = async (
       })
     }
 
-    const notifications = await Notification.find()  
+    const notifications = await Notification.find()
       .populate({
         path: 'senderId',
         select: ['username', 'profileImage'],
       })
-      .sort({ createdAt: 'descending' })    
+      .sort({ createdAt: 'descending' })
 
-    getIO().emit('quotes', { action: 'addComment', quote: newQuote, notifications })
+    getIO().emit('quotes', {
+      action: 'addComment',
+      quote: newQuote,
+      notifications,
+    })
 
     res.status(201).json({
       message: 'Comment added successfully',
@@ -312,8 +315,15 @@ export const addLike = async (
   const { quoteId, userId } = req.body
 
   try {
+    if (!userId) {
+      return res.status(404).json({
+        message: 'User does not exists',
+      })
+    }
     const quote = await Quote.findById(quoteId)
-    const alreadyLiked = quote.likes.length > 0 && quote?.likes.find((user) => user.toString() === userId)
+    const alreadyLiked =
+      quote!.likes.length > 0 &&
+      quote?.likes.find((user) => user.toString() === userId)
 
     if (alreadyLiked) {
       let index = quote!.likes.indexOf(userId)
@@ -341,18 +351,18 @@ export const addLike = async (
         })
       }
 
-      const notifications = await Notification.find()  
-      .populate({
-        path: 'senderId',
-        select: ['username', 'profileImage'],
-      })
-      .sort({ createdAt: 'descending' })    
+      const notifications = await Notification.find()
+        .populate({
+          path: 'senderId',
+          select: ['username', 'profileImage'],
+        })
+        .sort({ createdAt: 'descending' })
 
       getIO().emit('quotes', {
         action: 'like',
         likes: quote!.likes,
         id: quote!._id,
-        notifications: notifications
+        notifications: notifications,
       })
 
       res.status(201).json({

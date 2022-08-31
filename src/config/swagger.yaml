@@ -1358,6 +1358,146 @@ paths:
                             updatedAt: 
                                 type: string
                                 example: i2022-08-24T14:38:35.065Z
+
+  /notifications:
+    get: 
+      tags:
+        - Notifications
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Notification list
+          content:
+            application/json:
+              schema: 
+                        type: array
+                        items:
+                          type: object
+                          properties:  
+                            receiverId: 
+                                type: string
+                                example: Frankly, my dear, I don't give a damn.
+                            senderId: 
+                                type: object
+                                properties:
+                                  username:
+                                        type: string
+                                        example: Nyx
+                                  profileImage:
+                                        type: string
+                                        example: images/1660137533868-Beka.png
+                            quoteId:
+                                        type: string
+                                        example: 6305133f94b0db6ac93c3353
+                            type: 
+                                    type: string
+                                    example: "like"
+                            isRead: 
+                                    type: boolean
+                                    example: true
+                            createdAt: 
+                                type: string
+                                example: i2022-08-23T17:58:16.836Z
+                            updatedAt: 
+                                type: string
+                                example: i2022-08-24T14:38:35.065Z
+
+  /read-notifications/{id}:
+   patch:
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            minimum: 1
+          description: Notification id
+      tags:
+        - Notifications
+      security:
+        - bearerAuth: []
+      responses:
+        '200': 
+          description: Marks individual notification as read
+          content:
+            application/json:
+              schema: 
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Notification marked as read
+
+  /read-all:
+   put:
+      tags:
+        - Notifications
+      security:
+        - bearerAuth: []
+      responses:
+        '200': 
+          description: Marks all notification as read
+          content:
+            application/json:
+              schema: 
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: All notification marked as read
+                  notifications:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                          receiverId: 
+                                type: string
+                                example: Frankly, my dear, I don't give a damn.
+                          senderId: 
+                                type: object
+                                properties:
+                                  username:
+                                        type: string
+                                        example: Nyx
+                                  profileImage:
+                                        type: string
+                                        example: images/1660137533868-Beka.png
+                          quoteId:
+                                        type: string
+                                        example: 6305133f94b0db6ac93c3353
+                          type: 
+                                    type: string
+                                    example: "like"
+                          isRead: 
+                                    type: boolean
+                                    example: true
+                          createdAt: 
+                                type: string
+                                example: i2022-08-23T17:58:16.836Z
+                          updatedAt: 
+                                type: string
+                                example: i2022-08-24T14:38:35.065Z
+
+  /delete-notifications:
+    delete:
+      tags:
+        - Notifications
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Notifications deleted successfully
+                        
+                   
                       
                         
 
