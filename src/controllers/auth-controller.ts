@@ -17,7 +17,7 @@ export const signup = async (req: Request, res: Response, next: NextFunction) =>
   }
   try {
     const existingUser = await User.findOne({ username })
-    const existingEmail = await User.findOne({ email })
+    const existingEmail = await User.findOne({ 'emails.email': email })
 
     if (existingUser) {
       res.status(409).json({
@@ -36,10 +36,21 @@ export const signup = async (req: Request, res: Response, next: NextFunction) =>
 
     const response = await User.create({
       username,
-      email,
       password: hashedPass,
       
     })
+
+    const data = {
+      email,
+      verified: false,
+      primary: true
+
+    }
+
+    const userInfo = await User.findOne({username})
+    userInfo!.emails.push(data)
+
+    await userInfo!.save()
 
     res.status(201).json({
       message: 'User Created Successfully',
@@ -54,7 +65,7 @@ export const signup = async (req: Request, res: Response, next: NextFunction) =>
       { expiresIn: '1h' }
     )
 
-    await sendConfirmationEmail(response.username, response.email, token)
+    await sendConfirmationEmail(username, email as string, token)
 
 
   } catch (err: any) {
@@ -82,9 +93,9 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
       return res.status(401).json({message: 'Please provide correct credentials'})
     }
 
-    if(existingUser!.verified === false) {
-      return res.status(401).json({message: 'You\'re email is not verified, please verify your account first'})
-    }
+    // if(existingUser!.verified === false) {
+    //   return res.status(401).json({message: 'You\'re email is not verified, please verify your account first'})
+    // }
 
 
     const token = jwt.sign(
@@ -140,6 +151,9 @@ export const authGoogle = async (req: Request, res: Response, next: NextFunction
 
 }
 
+
+//shesasworebelia esec 
+
 export const verifyAccount = async (req: Request, res: Response, next: NextFunction) => {
   try {
 
@@ -178,20 +192,29 @@ export const verifyAccount = async (req: Request, res: Response, next: NextFunct
 export const passwordRecovery = async (req: Request, res: Response, next: NextFunction) => {
  const { email } = req.body
  try {
-   const existingUser = await User.findOne({ email })
-  
-      if(!existingUser) {
-        res.status(404).json({ message: 'Unfortunately user doesn\'t exists' })
-        return
-      }
+   const existingUser = await User.findOne({ 'emails.email': email })  
+
+   if(!existingUser) {
+    res.status(404).json({ message: 'Unfortunately user doesn\'t exists' })
+    return
+  }
+
+  const verifiedUser = existingUser?.emails.filter(emails => {
+    return emails.email === email && emails.verified === true
+  })
+
+  if(verifiedUser.length === 0) {
+    res.status(403).json({ message: 'This email isn\'t verified' })
+    return
+  }
     
-    res.status(200).json({
+  res.status(200).json({
         message: 'Password recovery link is sent',
         
-      })
+  })
     const token = jwt.sign({ email }, process.env.JWT_SEC_PASS,  { expiresIn: '1h' })
   
-    await sendPasswordChangeEmail(existingUser.username, existingUser.email, token)
+    await sendPasswordChangeEmail(existingUser.username, email, token)
  
  } catch(err: any) {
     if (!err.statusCode) {
@@ -215,7 +238,7 @@ export const updatePassword = async (req: Request, res: Response, next: NextFunc
 
   try {
     const { email } = jwt.verify(token, process.env.JWT_SEC_PASS) as JwtPayload
-    const existingUser = await User.findOne({ email })
+    const existingUser = await User.findOne({ 'emails.email': email })
 
     if(!password) {
       return res.status(404).json({

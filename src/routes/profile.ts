@@ -1,5 +1,5 @@
 import express from 'express'
-import {  getProfileInfo, updateProfile } from 'controllers'
+import {  getUserInfo, updateProfile } from 'controllers'
 import { validateUpdateProfile } from 'schemas'
 import multer from 'multer';
 import { isAuth } from 'middlewares'
@@ -19,8 +19,9 @@ const storageConfig = multer.diskStorage({
 
 const router = express.Router()
 
-router.post('/update-profile', isAuth, validateUpdateProfile(),  upload.single('image'), updateProfile)
-router.get('/profile/:userId', isAuth, getProfileInfo)
+// router.post('/update-profile', isAuth, validateUpdateProfile(),  upload.single('image'), updateProfile)
+router.patch('/update-profile', upload.single('image'), updateProfile)
+router.get('/user/:userId', isAuth, getUserInfo)
 
 
 export default router
