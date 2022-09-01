@@ -27,6 +27,11 @@ const signupSchema = new mongoose.Schema({
 
   },
 
+  activated: {
+    type: Schema.Types.Boolean,
+    default: false
+  },
+
   profileImage: {
     type: String,
   },

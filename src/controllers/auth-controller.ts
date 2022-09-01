@@ -81,11 +81,35 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
 
   try {
 
-    const existingUser = await User.findOne(!user.includes('@')? {username: user} : {email: user})
+
+
+    // const verifiedUser = existingUser?.emails.filter(emails => {
+    //   return emails.email === email && emails.verified === true
+    // })
+    // const existingUser = await User.findOne(!user.includes('@')? {username: user} : {'emails.email': user})
+
+    let existingUser
+
+    if(!user.includes('@')) {
+      existingUser = await User.findOne({username: user})
+    } else {
+      const findUser = await User.findOne({ 'emails.email': user })  
+      const emailIsVerified = findUser?.emails.filter(emails => {
+          return emails.email === user && emails.verified === true
+        })
+        emailIsVerified?.length  === 0 ? existingUser = null : existingUser = findUser 
+    }
+
 
     if(!existingUser) {
       return res.status(404).json({message: 'Please provide correct credentials'})
     }
+
+    if(existingUser!.activated === false) {
+      return res.status(401).json({message: 'You\'re account is not activated, please activate your account first'})
+    }
+
+  
 
     const isPasswordEqual = await bcrypt.compare(password, existingUser!.password!)
     
@@ -93,9 +117,7 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
       return res.status(401).json({message: 'Please provide correct credentials'})
     }
 
-    // if(existingUser!.verified === false) {
-    //   return res.status(401).json({message: 'You\'re email is not verified, please verify your account first'})
-    // }
+
 
 
     const token = jwt.sign(
@@ -152,8 +174,6 @@ export const authGoogle = async (req: Request, res: Response, next: NextFunction
 }
 
 
-//shesasworebelia esec 
-
 export const verifyAccount = async (req: Request, res: Response, next: NextFunction) => {
   try {
 
@@ -176,8 +196,10 @@ export const verifyAccount = async (req: Request, res: Response, next: NextFunct
       return
     }
   
-    await user.updateOne({ verified: true })
-    res.status(200).json({message: 'Your account is verified'})
+    await user.updateOne({activated: true})   
+
+
+    res.status(200).json({message: 'Your account is activated'})
 
   } catch (err: any) {
     if (!err.statusCode) {
