@@ -51,12 +51,6 @@ export const signup = async (req: Request, res: Response, next: NextFunction) =>
       
     })
 
-  
-    // const userInfo = await User.findOne({username})
-    // userInfo!.emails.push(data)
-
-    // await userInfo!.save()
-
     res.status(201).json({
       message: 'User Created Successfully',
       
@@ -85,13 +79,6 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
   const {user, password, remember} = req.body
 
   try {
-
-    // const existingUser = await User.findOne(!user.includes('@')? {username: user} : {'emails.email': user})
-
-    // const verifiedUser = existingUser?.emails.filter(emails => {
-    //   return emails.email === user && emails.verified === true
-    // })
-
     let existingUser
 
     if(!user.includes('@')) {

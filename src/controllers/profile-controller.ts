@@ -13,6 +13,7 @@ export const getUserInfo = async (
     const user = await User.findById({ _id: userId }).select([
       'username',
       'profileImage',
+      'email'
     ])
     res.status(200).json({ user })
   } catch (err: any) {
@@ -28,12 +29,14 @@ export const updateProfile = async (
   res: Response,
   next: NextFunction
 ) => {
-  const { password, userId, newPassword, emails } = req.body
+  const { password, userId, newPassword, emails, email, username } = req.body
   const profileImage = req.file!
+
 
   try {
     let reqBody
     let hashedPass
+    let user
 
     // if (!profileImage && !password) {
     //   reqBody = { username, emails }
@@ -42,46 +45,54 @@ export const updateProfile = async (
     // } else if (!password) {
     //   reqBody = { username, emails, profileImage: profileImage.path }
     // }
-    const emailList = emails.map(
-      (existingEmail: { email: string }) => existingEmail.email
-    )
-    let findDuplicates = emailList.filter(
-      (item: string, index: number) => emailList.indexOf(item) != index
-    )
+    
 
-    if (findDuplicates.length > 0) {
-      res.status(403).json({
-        message: 'One of the emails already exists',
+    if(email ) {
+       user = await User.findByIdAndUpdate(userId, {username}, {
+        new: true,
+      })
+    } else {
+
+      const emailList = emails.map(
+        (existingEmail: { email: string }) => existingEmail.email
+      )
+      let findDuplicates = emailList.filter(
+        (item: string, index: number) => emailList.indexOf(item) != index
+      )
+  
+      if (findDuplicates.length > 0) {
+        res.status(403).json({
+          message: 'One of the emails already exists',
+        })
+      }
+  
+      if (password) {
+        hashedPass = await bcrypt.hash(password, 12)
+      }
+  
+      if (!profileImage && !newPassword) {
+        reqBody = { ...req.body, password: hashedPass }
+      } else if (!profileImage && newPassword) {
+        const hashedPass = await bcrypt.hash(newPassword, 12)
+        reqBody = { ...req.body, password: hashedPass }
+      } else if (profileImage && !newPassword) {
+        reqBody = {
+          ...req.body,
+          profileImage: profileImage.path,
+          password: hashedPass,
+        }
+      } else if (profileImage && newPassword) {
+        const hashedPass = await bcrypt.hash(newPassword, 12)
+        reqBody = {
+          ...req.body,
+          profileImage: profileImage.path,
+          password: hashedPass,
+        }
+      }
+      user = await User.findByIdAndUpdate(userId, reqBody, {
+        new: true,
       })
     }
-
-    if (password) {
-      hashedPass = await bcrypt.hash(password, 12)
-    }
-
-    if (!profileImage && !newPassword) {
-      reqBody = { ...req.body, password: hashedPass }
-    } else if (!profileImage && newPassword) {
-      const hashedPass = await bcrypt.hash(newPassword, 12)
-      reqBody = { ...req.body, password: hashedPass }
-    } else if (profileImage && !newPassword) {
-      reqBody = {
-        ...req.body,
-        profileImage: profileImage.path,
-        password: hashedPass,
-      }
-    } else if (profileImage && newPassword) {
-      const hashedPass = await bcrypt.hash(newPassword, 12)
-      reqBody = {
-        ...req.body,
-        profileImage: profileImage.path,
-        password: hashedPass,
-      }
-    }
-
-    const user = await User.findByIdAndUpdate(userId, reqBody, {
-      new: true,
-    })
 
     if (!user) {
       res.status(404).json({
