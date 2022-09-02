@@ -7,14 +7,9 @@ const validateSignupForm = () => [
     .isLength({ min: 3, max: 15 })
     .withMessage('required username length is min: 3, max: 15 characters'),
   body('email')
-  .notEmpty()
-  .withMessage('email field is required')
-  .isEmail()
-  .withMessage('Please enter a valid email.'),
-  body('password')
-  .notEmpty()
-  .withMessage('password field is required'),
- 
+    .notEmpty()
+    .withMessage('email field is required'),
+  body('password').notEmpty().withMessage('password field is required'),
 ]
 
 export default validateSignupForm

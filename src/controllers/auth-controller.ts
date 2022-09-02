@@ -15,9 +15,10 @@ export const signup = async (req: Request, res: Response, next: NextFunction) =>
   if (!errors.isEmpty()) {
     res.status(422).json({ errorMessage: errors.array()[0].msg })
   }
+  
   try {
     const existingUser = await User.findOne({ username })
-    const existingEmail = await User.findOne({ 'emails.email': email })
+    const existingEmail = await User.find({ 'emails.email': email })
 
     if (existingUser) {
       res.status(409).json({
@@ -25,7 +26,7 @@ export const signup = async (req: Request, res: Response, next: NextFunction) =>
       })
       return
     }  
-    if (existingEmail) {
+    if (existingEmail.length > 0) {
       res.status(409).json({
         message: 'someone with this credentials already exists!',
       })
@@ -34,12 +35,6 @@ export const signup = async (req: Request, res: Response, next: NextFunction) =>
 
     const hashedPass = await bcrypt.hash(password, 12)
 
-    const response = await User.create({
-      username,
-      password: hashedPass,
-      
-    })
-
     const data = {
       email,
       verified: false,
@@ -47,10 +42,20 @@ export const signup = async (req: Request, res: Response, next: NextFunction) =>
 
     }
 
-    const userInfo = await User.findOne({username})
-    userInfo!.emails.push(data)
+    const response = await User.create({
+      username,
+      password: hashedPass,
+      emails: [
+        {...data}
+      ]
+      
+    })
 
-    await userInfo!.save()
+  
+    // const userInfo = await User.findOne({username})
+    // userInfo!.emails.push(data)
+
+    // await userInfo!.save()
 
     res.status(201).json({
       message: 'User Created Successfully',
@@ -81,12 +86,11 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
 
   try {
 
-
+    // const existingUser = await User.findOne(!user.includes('@')? {username: user} : {'emails.email': user})
 
     // const verifiedUser = existingUser?.emails.filter(emails => {
-    //   return emails.email === email && emails.verified === true
+    //   return emails.email === user && emails.verified === true
     // })
-    // const existingUser = await User.findOne(!user.includes('@')? {username: user} : {'emails.email': user})
 
     let existingUser
 
@@ -94,6 +98,7 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
       existingUser = await User.findOne({username: user})
     } else {
       const findUser = await User.findOne({ 'emails.email': user })  
+      console.log(findUser)
       const emailIsVerified = findUser?.emails.filter(emails => {
           return emails.email === user && emails.verified === true
         })
@@ -109,16 +114,11 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
       return res.status(401).json({message: 'You\'re account is not activated, please activate your account first'})
     }
 
-  
-
     const isPasswordEqual = await bcrypt.compare(password, existingUser!.password!)
     
     if(!isPasswordEqual) {
       return res.status(401).json({message: 'Please provide correct credentials'})
     }
-
-
-
 
     const token = jwt.sign(
       { userId: existingUser!._id }, 
@@ -156,7 +156,7 @@ export const authGoogle = async (req: Request, res: Response, next: NextFunction
         username,        
       })
 
-      await googleUser.updateOne({ verified: true })
+      await googleUser.updateOne({ activated: true })
   
       res.status(201).json({
         message: 'User Created and verified Successfully',
@@ -196,8 +196,10 @@ export const verifyAccount = async (req: Request, res: Response, next: NextFunct
       return
     }
   
-    await user.updateOne({activated: true})   
+    user.activated = true
+    user.emails[0].verified = true
 
+    await user.save()
 
     res.status(200).json({message: 'Your account is activated'})
 
