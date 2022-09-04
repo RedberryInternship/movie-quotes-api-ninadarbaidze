@@ -13,7 +13,9 @@ export const getUserInfo = async (
     const user = await User.findById({ _id: userId }).select([
       'username',
       'profileImage',
-      'email'
+      'email',
+      'password',
+      'emails'
     ])
     res.status(200).json({ user })
   } catch (err: any) {
@@ -29,62 +31,40 @@ export const updateProfile = async (
   res: Response,
   next: NextFunction
 ) => {
-  const { password, userId, newPassword, emails, email, username } = req.body
+  const { userId, newPassword, emails, email, username } = req.body
   const profileImage = req.file!
-
 
   try {
     let reqBody
-    let hashedPass
     let user
 
-    // if (!profileImage && !password) {
-    //   reqBody = { username, emails }
-    // } else if (!profileImage) {
-    //   reqBody = { username, emails, password: hashedPass }
-    // } else if (!password) {
-    //   reqBody = { username, emails, profileImage: profileImage.path }
-    // }
-    
 
     if(email ) {
-       user = await User.findByIdAndUpdate(userId, {username}, {
+      if (!profileImage) {
+        reqBody = { username }
+      } else {
+        reqBody = { username, profileImage: profileImage.path }
+      }
+       user = await User.findByIdAndUpdate(userId, reqBody, {
         new: true,
       })
     } else {
-
-      const emailList = emails.map(
-        (existingEmail: { email: string }) => existingEmail.email
-      )
-      let findDuplicates = emailList.filter(
-        (item: string, index: number) => emailList.indexOf(item) != index
-      )
-  
-      if (findDuplicates.length > 0) {
-        res.status(403).json({
-          message: 'One of the emails already exists',
-        })
-      }
-  
-      if (password) {
-        hashedPass = await bcrypt.hash(password, 12)
-      }
-  
       if (!profileImage && !newPassword) {
-        reqBody = { ...req.body, password: hashedPass }
+        reqBody = { ...req.body, emails: JSON.parse(emails) }
       } else if (!profileImage && newPassword) {
         const hashedPass = await bcrypt.hash(newPassword, 12)
-        reqBody = { ...req.body, password: hashedPass }
+        reqBody = { ...req.body, emails: JSON.parse(emails), password: hashedPass }
       } else if (profileImage && !newPassword) {
         reqBody = {
           ...req.body,
+          emails: JSON.parse(emails),
           profileImage: profileImage.path,
-          password: hashedPass,
         }
       } else if (profileImage && newPassword) {
         const hashedPass = await bcrypt.hash(newPassword, 12)
         reqBody = {
           ...req.body,
+          emails: JSON.parse(emails),
           profileImage: profileImage.path,
           password: hashedPass,
         }

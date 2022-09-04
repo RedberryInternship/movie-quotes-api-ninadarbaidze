@@ -4,7 +4,7 @@ import { validationResult } from 'express-validator'
 import { User } from 'models'
 import { UserTypes } from 'types'
 import jwt, { JwtPayload } from 'jsonwebtoken'
-import { sendConfirmationEmail, sendPasswordChangeEmail } from 'mail'
+import { sendConfirmationEmail, sendPasswordChangeEmail, sendVerificationEmail } from 'mail'
 
 
 
@@ -85,7 +85,6 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
       existingUser = await User.findOne({username: user})
     } else {
       const findUser = await User.findOne({ 'emails.email': user })  
-      console.log(findUser)
       const emailIsVerified = findUser?.emails.filter(emails => {
           return emails.email === user && emails.verified === true
         })
@@ -189,6 +188,63 @@ export const verifyAccount = async (req: Request, res: Response, next: NextFunct
     await user.save()
 
     res.status(200).json({message: 'Your account is activated'})
+
+  } catch (err: any) {
+    if (!err.statusCode) {
+      err.statusCode = 500
+    }
+    next(err)
+  }
+
+
+}
+export const verificationEmail = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+
+    const {  email } = req.body
+
+    const existingEmail = await User.find({ 'emails.email': email })
+
+    if (existingEmail.length === 0) {
+      res.status(409).json({
+        message: 'This email either doesn\'t exists or is verified',
+      })
+      return
+    }
+
+    const token = jwt.sign({ email }, process.env.JWT_SEC_PASS,  { expiresIn: '1h' })
+  
+    await sendVerificationEmail(email, token)
+    res.status(200).json({message: 'Verification email was sent'})
+
+  } catch (err: any) {
+    if (!err.statusCode) {
+      err.statusCode = 500
+    }
+    next(err)
+  }
+
+}
+
+
+export const verifyEmail = async (req: Request, res: Response, next: NextFunction) => {
+  const {  token } = req.body
+  try {
+
+    const { email } = jwt.verify(token, process.env.JWT_SEC_PASS) as JwtPayload
+  
+    const user = await User.findOne({'emails.email': email})
+
+    if(!user) {
+      res.status(404).json({ message: 'Unfortunately user doesn\'t exists' })
+      return
+    }
+
+    const newUser = user?.emails.filter(emails => emails.email === email)
+    newUser[0].verified = true
+    
+    await user.save()    
+    res.status(200).json({message: 'Your email is verified!'})
 
   } catch (err: any) {
     if (!err.statusCode) {
