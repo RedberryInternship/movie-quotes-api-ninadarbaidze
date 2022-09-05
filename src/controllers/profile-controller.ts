@@ -15,7 +15,7 @@ export const getUserInfo = async (
       'profileImage',
       'email',
       'password',
-      'emails'
+      'emails',
     ])
     res.status(200).json({ user })
   } catch (err: any) {
@@ -38,14 +38,39 @@ export const updateProfile = async (
     let reqBody
     let user
 
+    if (emails) {
+      const emailList = JSON.parse(emails).map(
+        (emails: { email: string }) => emails.email
+      )
+      const existingUserEmail = await User.find({
+        'emails.email': { $in: emailList },
+      })
+      const existingGoogleUser = await User.find({
+        email: { $in: emailList },
+      })
 
-    if(email ) {
+      if (existingGoogleUser.length > 0 || existingUserEmail.length > 0) {
+        res.status(409).json({
+          message: 'Email already exists',
+        })
+      }
+    }
+
+    const existingUser = await User.find({ username })
+
+    if (existingUser) {
+      res.status(409).json({
+        message: 'User already exists',
+      })
+    }
+
+    if (email) {
       if (!profileImage) {
         reqBody = { username }
       } else {
         reqBody = { username, profileImage: profileImage.path }
       }
-       user = await User.findByIdAndUpdate(userId, reqBody, {
+      user = await User.findByIdAndUpdate(userId, reqBody, {
         new: true,
       })
     } else {
@@ -53,7 +78,11 @@ export const updateProfile = async (
         reqBody = { ...req.body, emails: JSON.parse(emails) }
       } else if (!profileImage && newPassword) {
         const hashedPass = await bcrypt.hash(newPassword, 12)
-        reqBody = { ...req.body, emails: JSON.parse(emails), password: hashedPass }
+        reqBody = {
+          ...req.body,
+          emails: JSON.parse(emails),
+          password: hashedPass,
+        }
       } else if (profileImage && !newPassword) {
         reqBody = {
           ...req.body,
