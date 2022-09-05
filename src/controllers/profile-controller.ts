@@ -49,7 +49,7 @@ export const updateProfile = async (
         email: { $in: emailList },
       })
 
-      if (existingGoogleUser.length > 0 || existingUserEmail.length > 0) {
+      if (existingGoogleUser.length > 0 || existingUserEmail.length > 1) {
         res.status(409).json({
           message: 'Email already exists',
         })
@@ -58,7 +58,7 @@ export const updateProfile = async (
 
     const existingUser = await User.find({ username })
 
-    if (existingUser) {
+    if (existingUser.length > 1) {
       res.status(409).json({
         message: 'User already exists',
       })
