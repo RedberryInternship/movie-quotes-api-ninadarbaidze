@@ -10,19 +10,36 @@ const signupSchema = new mongoose.Schema({
   },
   email: {
     type: String,
-    required: true,
+    required: false,
   },
+  emails: [
+
+      {
+        email: Schema.Types.String,
+        verified: {
+          type: Schema.Types.Boolean,
+        },
+        primary: {
+          type: Schema.Types.Boolean,
+          default: false,
+        },
+        
+      }
+  ],
   password: {
     type: String,
 
   },
+
+  activated: {
+    type: Schema.Types.Boolean,
+    default: false
+  },
+
   profileImage: {
     type: String,
   },
-  verified: {
-    type: Boolean,
-    default: false,
-  },
+
   movies: [{
     type: Schema.Types.ObjectId,
     ref: 'Movies',

@@ -120,6 +120,61 @@ paths:
                   message:
                     type: string
                     example: Your account is verified
+  /verify-email-send:
+    post:
+      tags:
+        - Authentication
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+              required:
+                - email
+              example:
+                email: test@gmail.com
+      responses:
+        '200':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Verification email was sent
+
+  /verify-email:
+    post:
+      tags:
+        - Authentication
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                token:
+                  type: string
+              required:
+                - token
+              example:
+                token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9
+      responses:
+        '200':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Your email is verified!
   
   /auth-google:
     post:
@@ -231,7 +286,7 @@ paths:
                         type: string
                       email:
                         type: string
-                      password:
+                      newPassword:
                         type: string
                       userId:
                         type: string
@@ -241,9 +296,9 @@ paths:
                         required:
                           - userId
                         example:
-                          usename: nyx123
+                          username: nyx123
                           email: nyx@gmail.com
-                          password: nyx@gmail.com
+                          newPassword: nyx@gmail.com
                           userId: ikjge89087nnvr6
                           image: filename
       responses:
