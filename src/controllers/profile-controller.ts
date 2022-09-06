@@ -45,11 +45,20 @@ export const updateProfile = async (
       const existingUserEmail = await User.find({
         'emails.email': { $in: emailList },
       })
+      const existingUserId = await User.findById(userId)
+
+      const samePerson =
+        existingUserEmail.length > 0 &&
+        existingUserEmail[0].username === existingUserId?.username
+
       const existingGoogleUser = await User.find({
         email: { $in: emailList },
       })
 
-      if (existingGoogleUser.length > 0 || existingUserEmail.length > 1) {
+      if (
+        existingGoogleUser.length > 0 ||
+        (existingUserEmail.length > 0 && !samePerson)
+      ) {
         res.status(409).json({
           message: 'Email already exists',
         })
