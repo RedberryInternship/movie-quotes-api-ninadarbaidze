@@ -4,18 +4,22 @@ import { UserTypes } from 'types'
 import { getIO } from 'socket'
 
 export const getMovies = async (
-  _req: Request,
+  req: Request,
   res: Response,
   next: NextFunction
 ) => {
+  const { userId } = req.params
   try {
-    const movies = await Movie.find()
+    const movies = await Movie.find({ userId })
       .populate({
         path: 'userId',
         select: ['-__v'],
       })
       .select('-__v')
       .sort({ createdAt: 'descending' })
+
+    console.log(movies)
+
     res.status(200).json(movies)
   } catch (err: any) {
     if (!err.statusCode) {
@@ -224,8 +228,8 @@ export const deleteMovie = async (
     }
     const user = await User.findById(movie?.userId)
 
-    let index = user!.movies.indexOf(movieId);
-    user!.movies.splice(index, 1); 
+    let index = user!.movies.indexOf(movieId)
+    user!.movies.splice(index, 1)
 
     user?.save()
     movie!.remove()
