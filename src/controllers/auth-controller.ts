@@ -23,16 +23,13 @@ export const signup = async (
   }
 
   try {
-    const existingUser = await User.findOne({ username })
-    const existingEmail = await User.find({ 'emails.email': email })
+    const existingUser = await User.find({
+      $or: [{ username }, { email }, { 'emails.email': email }],
+    })
 
-    if (existingUser) {
-      res.status(409).json({
-        message: 'someone with this credentials already exists!',
-      })
-      return
-    }
-    if (existingEmail.length > 0) {
+    console.log(existingUser)
+
+    if (existingUser.length > 0) {
       res.status(409).json({
         message: 'someone with this credentials already exists!',
       })
@@ -103,12 +100,10 @@ export const login = async (
     }
 
     if (existingUser!.activated === false) {
-      return res
-        .status(401)
-        .json({
-          message:
-            "You're account is not activated, please activate your account first",
-        })
+      return res.status(401).json({
+        message:
+          "You're account is not activated, please activate your account first",
+      })
     }
 
     const isPasswordEqual = await bcrypt.compare(

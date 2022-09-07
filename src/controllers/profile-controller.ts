@@ -38,24 +38,24 @@ export const updateProfile = async (
     let reqBody
     let user
 
-
-
     if (emails) {
       const emailList = JSON.parse(emails).map(
         (emails: { email: string }) => emails.email
       )
       const existingUserEmail = await User.find({
         $or: [
-          {email: { $in: emailList }},
-          {'emails.email': { $in: emailList }},
-        ]
+          { email: { $in: emailList } },
+          { 'emails.email': { $in: emailList } },
+        ],
       })
       const notSamePerson =
         existingUserEmail.length > 0 &&
-        existingUserEmail.filter(user => user._id.toString() !== userId)
+        existingUserEmail.filter((user) => user._id.toString() !== userId)
 
       if (
-        existingUserEmail.length > 0 && notSamePerson && notSamePerson.length > 0
+        existingUserEmail.length > 0 &&
+        notSamePerson &&
+        notSamePerson.length > 0
       ) {
         res.status(409).json({
           message: 'Email already exists',
@@ -65,11 +65,11 @@ export const updateProfile = async (
 
     const existingUser = await User.findOne({ username })
 
-    existingUser && existingUser._id.toString() !== userId && res.status(409).json({
-      message: 'User already exists',
-    })
-
-
+    existingUser &&
+      existingUser._id.toString() !== userId &&
+      res.status(409).json({
+        message: 'User already exists',
+      })
 
     if (email) {
       if (!profileImage) {
@@ -121,7 +121,6 @@ export const updateProfile = async (
       message: 'Profile updated successfully',
       user,
     })
-
   } catch (err: any) {
     if (!err.statusCode) {
       err.statusCode = 500
