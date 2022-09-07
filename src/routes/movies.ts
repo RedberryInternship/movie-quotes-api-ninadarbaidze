@@ -18,8 +18,8 @@ const storageConfig = multer.diskStorage({
 
 const router = express.Router()
 
-router.get('/movies', isAuth, getMovies)
-router.get('/movies/:movieId', getMoviesById)
+router.get('/movies/:userId', isAuth, getMovies)
+router.get('/movie/:movieId', getMoviesById)
 router.get('/genres', getGenres)
 router.post('/add-genres', isAuth, addGenres)
 router.post('/add-movie', isAuth,  upload.single('image'), addMovie)
