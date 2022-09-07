@@ -19,7 +19,7 @@ const storageConfig = multer.diskStorage({
 
 const router = express.Router()
 
-router.post('/update-profile', isAuth, validateUpdateProfile(),  upload.single('image'), updateProfile)
+router.put('/update-profile', isAuth, validateUpdateProfile(),  upload.single('image'), updateProfile)
 router.get('/user/:userId', isAuth, getUserInfo)
 
 

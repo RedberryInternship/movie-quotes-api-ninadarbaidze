@@ -38,26 +38,24 @@ export const updateProfile = async (
     let reqBody
     let user
 
+
+
     if (emails) {
       const emailList = JSON.parse(emails).map(
         (emails: { email: string }) => emails.email
       )
       const existingUserEmail = await User.find({
-        'emails.email': { $in: emailList },
+        $or: [
+          {email: { $in: emailList }},
+          {'emails.email': { $in: emailList }},
+        ]
       })
-      const existingUserId = await User.findById(userId)
-
-      const samePerson =
+      const notSamePerson =
         existingUserEmail.length > 0 &&
-        existingUserEmail[0].username === existingUserId?.username
-
-      const existingGoogleUser = await User.find({
-        email: { $in: emailList },
-      })
+        existingUserEmail.filter(user => user._id.toString() !== userId)
 
       if (
-        existingGoogleUser.length > 0 ||
-        (existingUserEmail.length > 0 && !samePerson)
+        existingUserEmail.length > 0 && notSamePerson && notSamePerson.length > 0
       ) {
         res.status(409).json({
           message: 'Email already exists',
@@ -65,13 +63,13 @@ export const updateProfile = async (
       }
     }
 
-    const existingUser = await User.find({ username })
+    const existingUser = await User.findOne({ username })
 
-    if (existingUser.length > 1) {
-      res.status(409).json({
-        message: 'User already exists',
-      })
-    }
+    existingUser && existingUser._id.toString() !== userId && res.status(409).json({
+      message: 'User already exists',
+    })
+
+
 
     if (email) {
       if (!profileImage) {
@@ -123,6 +121,7 @@ export const updateProfile = async (
       message: 'Profile updated successfully',
       user,
     })
+
   } catch (err: any) {
     if (!err.statusCode) {
       err.statusCode = 500
