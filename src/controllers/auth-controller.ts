@@ -102,7 +102,7 @@ export const login = async (
     if (existingUser!.activated === false) {
       return res.status(401).json({
         message:
-          "You're account is not activated, please activate your account first",
+          "Your account is not activated, please activate your account first",
       })
     }
 
