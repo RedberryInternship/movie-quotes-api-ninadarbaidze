@@ -272,6 +272,11 @@ export const addComment = async (
         path: 'movieId',
         select: ['en.movieName', 'ge.movieName', 'year'],
       })
+      .populate({
+        path: 'userId',
+        select: ['username', 'profileImage']
+
+      })
 
     if (quote?.userId?._id.toString() !== userId) {
       await Notification.create({
