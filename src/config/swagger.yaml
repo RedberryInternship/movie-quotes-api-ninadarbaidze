@@ -177,7 +177,7 @@ paths:
                     example: Your email is verified!
 
 
-  /user/{id}:
+  /check-user/{id}:
    get:
       parameters:
         - in: path

@@ -137,7 +137,7 @@ export const checkUser = async (
   res: Response,
   next: NextFunction
 ) => {
-  const { userId } = req.body
+  const { userId } = req.params
 
   try {
     const existingUser = await User.findOne({ _id: userId })
