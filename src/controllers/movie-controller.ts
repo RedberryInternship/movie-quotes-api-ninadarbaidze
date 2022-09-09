@@ -18,7 +18,6 @@ export const getMovies = async (
       .select('-__v')
       .sort({ createdAt: 'descending' })
 
-    console.log(movies)
 
     res.status(200).json(movies)
   } catch (err: any) {

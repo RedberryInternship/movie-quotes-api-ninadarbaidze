@@ -27,7 +27,6 @@ export const signup = async (
       $or: [{ username }, { email }, { 'emails.email': email }],
     })
 
-    console.log(existingUser)
 
     if (existingUser.length > 0) {
       res.status(409).json({
