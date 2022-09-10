@@ -175,6 +175,32 @@ paths:
                   message:
                     type: string
                     example: Your email is verified!
+
+
+  /check-user/{id}:
+   get:
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            minimum: 1
+          description: user id
+      tags:
+        - Authentication
+      responses:
+        '200': 
+          description: Return user info
+          content:
+            application/json:
+              schema: 
+                type: object
+                properties:
+                  message:
+                      type: string
+                      example: User exists
+
   
   /auth-google:
     post:

@@ -27,7 +27,6 @@ export const signup = async (
       $or: [{ username }, { email }, { 'emails.email': email }],
     })
 
-    console.log(existingUser)
 
     if (existingUser.length > 0) {
       res.status(409).json({
@@ -102,7 +101,7 @@ export const login = async (
     if (existingUser!.activated === false) {
       return res.status(401).json({
         message:
-          "Your account is not activated, please activate your account first",
+          'Your account is not activated, please activate your account first',
       })
     }
 
@@ -124,6 +123,29 @@ export const login = async (
     )
 
     res.status(200).json({ token, userId: existingUser!._id })
+  } catch (err: any) {
+    if (!err.statusCode) {
+      err.statusCode = 500
+    }
+    next(err)
+  }
+}
+
+export const checkUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const { userId } = req.params
+
+  try {
+    const existingUser = await User.findOne({ _id: userId })
+
+    if (!existingUser) {
+      return res.status(404).json({ message: "User doesn't exists" })
+    } else {
+      res.status(200).json({ message: 'User exists' })
+    }
   } catch (err: any) {
     if (!err.statusCode) {
       err.statusCode = 500
