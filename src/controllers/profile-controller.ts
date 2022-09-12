@@ -136,7 +136,6 @@ export const updateGoogleUserImage = async (
   next: NextFunction
 ) => {
   const { userId } = req.params
-console.log(req.body)
   try {
     await User.findByIdAndUpdate(userId, req.body, {
       new: true,
