@@ -128,3 +128,23 @@ export const updateProfile = async (
     next(err)
   }
 }
+
+
+export const updateGoogleUserImage = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const { userId } = req.params
+  try {
+    await User.findByIdAndUpdate(userId, req.body, {
+      new: true,
+    })    
+    res.status(200).json({message: "User updated"})
+  } catch (err: any) {
+    if (!err.statusCode) {
+      err.statusCode = 500
+    }
+    next(err)
+  }
+}
