@@ -57,7 +57,7 @@ export const updateProfile = async (
         notSamePerson &&
         notSamePerson.length > 0
       ) {
-        res.status(409).json({
+       return res.status(409).json({
           message: 'Email already exists',
         })
       }
