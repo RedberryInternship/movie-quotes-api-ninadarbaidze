@@ -183,7 +183,7 @@ export const authGoogle = async (
 
     const existingEmail = await User.find({ 'emails.email': email })
 
-    if(existingEmail) {
+    if(existingEmail.length > 0) {
       return res.status(409).json({message: 'User already exists'})
     }
 
