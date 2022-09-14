@@ -140,6 +140,7 @@ export const checkUser = async (
 
   try {
     const existingUser = await User.findOne({ _id: userId })
+    
 
     if (!existingUser) {
       return res.status(404).json({ message: "User doesn't exists" })
@@ -154,6 +155,24 @@ export const checkUser = async (
   }
 }
 
+export const checkToken = async (
+  req: Request,
+  res: Response,
+) => {
+  const { token } = req.params
+
+  let decodedToken
+
+    decodedToken = jwt.verify(token,  process.env.JWT_SEC_AUTH)
+
+  if (!decodedToken) {
+    res.status(404).json({
+      message: 'Token is Invalid',
+    })
+  }
+  
+}
+
 export const authGoogle = async (
   req: Request,
   res: Response,
@@ -161,6 +180,12 @@ export const authGoogle = async (
 ) => {
   try {
     const { email, username } = req.body
+
+    const existingEmail = await User.find({ 'emails.email': email })
+
+    if(existingEmail.length > 0) {
+      return res.status(409).json({message: 'User already exists'})
+    }
 
     const existing = await User.findOne({ email })
 
