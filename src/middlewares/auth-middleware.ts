@@ -4,6 +4,7 @@ import {Error} from 'types/global'
 
 const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
   const authHeader = req.get('Authorization')
+  console.log(authHeader)
   if (!authHeader) {
     res.status(403).json({ message: 'Forbidden' })
     const error = new Error('Forbidden') as Error
